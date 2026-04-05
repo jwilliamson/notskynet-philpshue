@@ -1,0 +1,177 @@
+---
+name: hue-summary
+description: Analyze and summarize your Philips Hue architecture from household_architecture.yaml
+---
+
+# hue-summary
+
+Analyze and summarize your Philips Hue smart home architecture from the exported YAML configuration. Provides insights into rooms, zones, devices, lights, and scenes.
+
+## Workflow
+
+### Step 1: Read the Architecture File
+
+Read the `household_architecture.yaml` file in the current working directory using the Read tool.
+
+### Step 2: Parse and Analyze Data
+
+Extract key information from the YAML:
+
+**Top-level collections:**
+- `rooms` - Physical rooms with lights and scenes
+- `zones` - Logical groupings of lights
+- `devices` - Physical Hue devices (bulbs, switches, bridges)
+
+**For each room/zone:**
+- `id` - Unique identifier
+- `name` - Friendly name
+- `archetype` - Room/zone type (kitchen, bedroom, hallway, etc.)
+- `lights[]` - Array of light states
+- `scenes[]` - Array of scene configurations
+
+**For each light:**
+- `id` - Light service ID
+- `name` - Friendly name
+- `on` - Boolean state (true/false)
+- `brightness` - 0-100 percentage
+- `color` - Either `xy` coordinates or `mirek` color temperature
+
+**For each device:**
+- `model_id` - Device model (e.g., LCA001, LCG002, RWL022)
+- `archetype` - Device type
+- `software_version` - Firmware version
+
+**For each scene:**
+- `name` - Scene name
+- `actions[]` - Array of light actions with specific states
+
+### Step 3: Calculate Statistics
+
+Compute summary metrics:
+
+**Overview:**
+- Total rooms, zones, devices
+- Total lights (deduplicate across rooms/zones)
+- Total scenes
+- Lights currently on vs off
+
+**Device breakdown:**
+- Count by model type
+- Identify bulbs vs switches vs infrastructure
+- Check for software version consistency
+
+**Room/Zone analysis:**
+- Average lights per room/zone
+- Average scenes per room/zone
+- Identify largest/smallest spaces
+
+**Scene analysis:**
+- Most common scene names
+- Average actions per scene
+- Identify rooms with most/least scenes
+
+### Step 4: Format Summary Output
+
+Present a well-structured markdown summary:
+
+```markdown
+# 🏠 Hue Architecture Summary
+
+## 📊 Overview
+- **Rooms:** X
+- **Zones:** Y
+- **Devices:** Z
+- **Lights:** A (B on, C off)
+- **Scenes:** D
+
+## 🏠 Rooms
+| Room Name | Type | Lights | Scenes | State |
+|-----------|------|--------|--------|-------|
+| Living Room | living_room | 10 | 5 | 10 on |
+| Kitchen | kitchen | 6 | 7 | 0 on |
+...
+
+## 🔲 Zones
+| Zone Name | Type | Lights | Scenes |
+|-----------|------|--------|--------|
+| Kitchen Spotlights | kitchen | 6 | 4 |
+...
+
+## 💡 Devices by Type
+
+**Bulbs/Lights (X devices):**
+- LCA001 (pendant round): Y devices
+- LCG002 (spotlights): Z devices
+...
+
+**Switches/Controls (X devices):**
+- RWL022 (dimmer switch): Y devices
+- RDM004 (wall module): Z devices
+
+**Infrastructure:**
+- Hue Bridge (BSB002): version X.X.X
+
+## 🎨 Scene Insights
+- Most common scenes: Relax (12 rooms), Bright (11 rooms), Nightlight (10 rooms)
+- Rooms with most scenes: Living Room (5), Kitchen (7)
+- Average actions per scene: X
+
+## ⚠️ Notable Observations
+- All lights in Bedroom are currently off
+- Living Room has the most lights (10)
+- Software versions: [note any inconsistencies]
+- [Any other interesting patterns]
+```
+
+**Formatting guidelines:**
+- Use tables for structured multi-column data
+- Use emojis for section headers
+- Bold important numbers
+- Group similar items together
+- Highlight any anomalies or interesting patterns
+
+### Step 5: Answer Follow-up Questions
+
+If the user has specific questions, filter and present relevant data:
+
+**Room/Zone queries:**
+- "What's in the kitchen?" → Show kitchen room + kitchen zones
+- "Which room has most lights?" → Sort and highlight
+
+**Light queries:**
+- "Which lights are on?" → Filter lights by state
+- "What's the brightest setting?" → Analyze scene brightness values
+
+**Scene queries:**
+- "What scenes are in the bedroom?" → List bedroom scenes with details
+- "What's the Nightlight scene like?" → Show Nightlight actions across rooms
+
+**Device queries:**
+- "How many bulbs do I have?" → Count light devices
+- "What switches are installed?" → List switch models
+
+## Usage
+
+Invoke with: `/hue-summary [optional question]`
+
+Examples:
+- `/hue-summary` - Full architecture summary
+- `/hue-summary what's in the living room?` - Focus on living room
+- `/hue-summary how many lights are on?` - Light state summary
+- `/hue-summary show me all scenes` - Scene breakdown
+
+## Notes
+
+- This skill is READ-ONLY - it analyzes the exported YAML configuration
+- Data represents the state at the time of export, not real-time
+- File location: `household_architecture.yaml` in current directory
+- The same light may appear in both a room and multiple zones
+- Scenes contain "recipes" with exact color/brightness settings for each light
+- Script to regenerate: `python export_hue_architecture.py`
+
+## Technical Details
+
+- Source file: `household_architecture.yaml`
+- Generated by: `export_hue_architecture.py`
+- API: Philips Hue CLIP API v2
+- Format: YAML (PyYAML)
