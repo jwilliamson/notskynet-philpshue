@@ -4,6 +4,9 @@
 # Generated Hue architecture export (contains household state snapshot)
 household_architecture.yaml
 
+# Generated scene gallery export (contains deduplicated scene configurations)
+scene_gallery.yaml
+
 # Python
 __pycache__/
 *.py[cod]
