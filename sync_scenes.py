@@ -834,37 +834,23 @@ class HueAPIClient:
 
     def _build_long_press_config(
         self,
-        button_number: int,
-        room_lookup: Dict[str, str]
+        button_number: int
     ) -> Dict[str, Any]:
         """
         Build on_long_press configuration for button.
 
-        Button 1 (ON button) turns off all house lights when held.
+        Button 1 (ON button) turns off all house lights when held using home_off action.
         All other buttons do nothing on hold.
 
         Args:
             button_number: Button number (1-4)
-            room_lookup: Room name to ID mapping (for all_lights_off)
 
         Returns:
             Dictionary with on_long_press configuration
         """
         # Only button 1 (ON button) has hold-to-turn-off-all functionality
         if button_number == 1:
-            # Build where clause targeting ALL rooms
-            where_clause = [
-                {"group": {"rid": room_id, "rtype": "room"}}
-                for room_id in room_lookup.values()
-            ]
-
-            return {
-                "recall_single_extended": {
-                    "actions": [{"action": "off"}],
-                    "with_off": {"enabled": True}
-                },
-                "where": where_clause
-            }
+            return {"action": "home_off"}
 
         # All other buttons: do nothing on hold
         return {"action": "do_nothing"}
@@ -928,13 +914,6 @@ class HueAPIClient:
                         }
                     })
 
-                # Build long press configuration and merge where clauses
-                long_press_dict = self._build_long_press_config(button_cfg.button_number, room_lookup)
-                where_clause = [{"group": {"rid": target_id, "rtype": target_rtype}}]
-                if "where" in long_press_dict:
-                    # Merge: add all-rooms to existing room target
-                    where_clause.extend(long_press_dict.pop("where"))
-
                 buttons_config[button_id] = {
                     "on_short_release": {
                         "time_based_extended": {
@@ -942,8 +921,8 @@ class HueAPIClient:
                             "with_off": {"enabled": True}
                         }
                     },
-                    "on_long_press": long_press_dict,
-                    "where": where_clause
+                    "on_long_press": self._build_long_press_config(button_cfg.button_number),
+                    "where": [{"group": {"rid": target_id, "rtype": target_rtype}}]
                 }
 
             elif button_cfg.action == 'scene_cycle':
@@ -954,12 +933,6 @@ class HueAPIClient:
                     scene_id = scene_name_to_id[scene_name]
                     scene_slots.append([{"action": {"recall": {"rid": scene_id, "rtype": "scene"}}}])
 
-                # Build long press configuration and merge where clauses
-                long_press_dict = self._build_long_press_config(button_cfg.button_number, room_lookup)
-                where_clause = [{"group": {"rid": target_id, "rtype": target_rtype}}]
-                if "where" in long_press_dict:
-                    where_clause.extend(long_press_dict.pop("where"))
-
                 buttons_config[button_id] = {
                     "on_short_release": {
                         "scene_cycle_extended": {
@@ -968,32 +941,21 @@ class HueAPIClient:
                             "with_off": {"enabled": False}
                         }
                     },
-                    "on_long_press": long_press_dict,
-                    "where": where_clause
+                    "on_long_press": self._build_long_press_config(button_cfg.button_number),
+                    "where": [{"group": {"rid": target_id, "rtype": target_rtype}}]
                 }
 
             elif button_cfg.action in {'dim_up', 'dim_down'}:
                 # Dim buttons use implicit room context
-                long_press_dict = self._build_long_press_config(button_cfg.button_number, room_lookup)
-                where_clause = [{"group": {"rid": room_id, "rtype": "room"}}]
-                if "where" in long_press_dict:
-                    where_clause.extend(long_press_dict.pop("where"))
-
+                # Note: Buttons with on_repeat cannot have on_long_press (API constraint)
                 buttons_config[button_id] = {
                     "on_repeat": {"action": button_cfg.action},
-                    "on_long_press": long_press_dict,
-                    "where": where_clause
+                    "where": [{"group": {"rid": room_id, "rtype": "room"}}]
                 }
 
             elif button_cfg.action == 'room_toggle':
                 # Room toggle configuration
                 target_id, target_rtype = self._resolve_target(button_cfg.target, room_lookup, zone_lookup)
-
-                # Build long press configuration and merge where clauses
-                long_press_dict = self._build_long_press_config(button_cfg.button_number, room_lookup)
-                where_clause = [{"group": {"rid": target_id, "rtype": target_rtype}}]
-                if "where" in long_press_dict:
-                    where_clause.extend(long_press_dict.pop("where"))
 
                 buttons_config[button_id] = {
                     "on_short_release": {
@@ -1002,8 +964,8 @@ class HueAPIClient:
                             "with_off": {"enabled": True}
                         }
                     },
-                    "on_long_press": long_press_dict,
-                    "where": where_clause
+                    "on_long_press": self._build_long_press_config(button_cfg.button_number),
+                    "where": [{"group": {"rid": target_id, "rtype": target_rtype}}]
                 }
 
         # Build final behavior_instance body
