@@ -9,6 +9,7 @@ Phases:
 1. Resource Scaffolding: Pull rooms, zones, and devices
 2. Service Join: Map light services to rooms/zones
 3. Scene Recipes: Capture scene configurations
+4. Button Configuration: Export switch button settings
 """
 
 import os
@@ -202,6 +203,172 @@ def extract_scene_data(scene: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def is_switch_device(device: Dict[str, Any]) -> bool:
+    """
+    Check if a device is a switch (dimmer or smart button).
+
+    Args:
+        device: Device dictionary with 'model_id' key
+
+    Returns:
+        True if device is a switch (RWL* or RDM* model), False otherwise
+    """
+    model_id = device.get('model_id')
+    if not model_id:
+        return False
+    return model_id.startswith('RWL') or model_id.startswith('RDM')
+
+
+def extract_button_action_type(button_config: Dict[str, Any]) -> str:
+    """
+    Determine the action type from a button configuration.
+
+    Args:
+        button_config: Button configuration dictionary from behavior_instance
+
+    Returns:
+        Action type string: "scene_cycle", "room_toggle", "dim_up", "dim_down", "timezone", or "unknown"
+    """
+    # Check for scene cycle pattern
+    on_short_release = button_config.get('on_short_release', {})
+    if 'scene_cycle_extended' in on_short_release:
+        return 'scene_cycle'
+
+    # Check for timezone-based scene change
+    if 'time_based_extended' in on_short_release:
+        return 'timezone'
+
+    # Check for room toggle pattern (recall with off enabled)
+    if 'recall_single_extended' in on_short_release:
+        with_off = on_short_release.get('recall_single_extended', {}).get('with_off', {})
+        if with_off.get('enabled'):
+            return 'room_toggle'
+
+    # Check for dim actions
+    on_repeat = button_config.get('on_repeat', {})
+    if on_repeat.get('action') == 'dim_up':
+        return 'dim_up'
+    if on_repeat.get('action') == 'dim_down':
+        return 'dim_down'
+
+    # Unknown pattern (custom or future feature)
+    return 'unknown'
+
+
+def extract_button_configuration(
+    behavior_instance: Dict[str, Any],
+    buttons_by_id: Dict[str, Dict[str, Any]],
+    rooms_by_id: Dict[str, Dict[str, Any]],
+    scenes_by_id: Dict[str, str]
+) -> Dict[str, Any]:
+    """
+    Extract button configuration from a behavior_instance.
+
+    Args:
+        behavior_instance: Behavior instance resource from API
+        buttons_by_id: Lookup map of button UUID → button with control_id
+        rooms_by_id: Lookup map of room UUID → room dict
+        scenes_by_id: Lookup map of scene UUID → scene name
+
+    Returns:
+        Structured button configuration dictionary
+    """
+    config = behavior_instance.get('configuration', {})
+    buttons_config = config.get('buttons', {})
+
+    result = {
+        'id': behavior_instance.get('id'),
+        'enabled': behavior_instance.get('enabled', True),
+        'buttons': []
+    }
+
+    # Process each button configuration
+    for button_id, button_config in buttons_config.items():
+        # Resolve button UUID to control_id
+        button_info = buttons_by_id.get(button_id, {})
+        control_id = button_info.get('metadata', {}).get('control_id')
+
+        if control_id is None:
+            continue  # Skip if we can't resolve button
+
+        # Determine action type
+        action_type = extract_button_action_type(button_config)
+
+        # Extract target room name
+        where = button_config.get('where', [])
+        target_room = None
+        if where:
+            group_rid = where[0].get('group', {}).get('rid')
+            if group_rid and group_rid in rooms_by_id:
+                target_room = rooms_by_id[group_rid].get('name')
+
+        button_data = {
+            'control_id': control_id,
+            'action_type': action_type,
+            'target_room': target_room
+        }
+
+        # Extract scene names for scene_cycle
+        if action_type == 'scene_cycle':
+            scene_names = []
+            on_short_release = button_config.get('on_short_release', {})
+            scene_cycle = on_short_release.get('scene_cycle_extended', {})
+            slots = scene_cycle.get('slots', [])
+
+            for slot in slots:
+                if isinstance(slot, list) and slot:
+                    scene_rid = slot[0].get('action', {}).get('recall', {}).get('rid')
+                    if scene_rid:
+                        scene_name = scenes_by_id.get(scene_rid, scene_rid)
+                        scene_names.append(scene_name)
+
+            if scene_names:
+                button_data['scene_names'] = scene_names
+
+        # For timezone configs, resolve scene UUIDs to names and preserve structure
+        elif action_type == 'timezone':
+            on_short_release = button_config.get('on_short_release', {})
+            time_based = on_short_release.get('time_based_extended', {})
+            slots = time_based.get('slots', [])
+
+            # Create a copy with resolved scene names
+            resolved_slots = []
+            for slot in slots:
+                actions = slot.get('actions', [])
+                start_time = slot.get('start_time', {})
+
+                resolved_actions = []
+                for action in actions:
+                    scene_rid = action.get('action', {}).get('recall', {}).get('rid')
+                    if scene_rid:
+                        scene_name = scenes_by_id.get(scene_rid, scene_rid)
+                        resolved_actions.append({
+                            'scene': scene_name,
+                            'scene_id': scene_rid  # Preserve UUID for reference
+                        })
+
+                resolved_slots.append({
+                    'start_time': start_time,
+                    'scenes': resolved_actions
+                })
+
+            button_data['timezone_slots'] = resolved_slots
+
+            # Also preserve raw configuration for full details
+            button_data['configuration'] = button_config
+
+        # For unknown types, preserve raw configuration only
+        elif action_type == 'unknown':
+            button_data['configuration'] = button_config
+
+        result['buttons'].append(button_data)
+
+    # Sort buttons by control_id for consistent output
+    result['buttons'].sort(key=lambda b: b['control_id'])
+
+    return result
+
+
 def phase_1_resource_scaffolding() -> Dict[str, Any]:
     """
     Phase 1: Pull rooms, zones, and devices from Hue Bridge.
@@ -350,6 +517,101 @@ def phase_3_scene_recipes(architecture: Dict[str, Any]) -> None:
             print(f"  WARNING: Scene '{scene['name']}' group_rid not found in rooms or zones")
 
 
+def phase_4_button_configuration(architecture: Dict[str, Any]) -> None:
+    """
+    Phase 4: Export button configurations for switch devices.
+
+    Args:
+        architecture: Dictionary from Phase 1-3 (modified in-place)
+    """
+    print("Phase 4: Exporting switch button configurations...")
+
+    try:
+        # Query button and behavior_instance endpoints
+        buttons_raw = query_endpoint('button')
+        behaviors_raw = query_endpoint('behavior_instance')
+
+        if not buttons_raw or not behaviors_raw:
+            print("  WARNING: Could not query button configurations, skipping Phase 4")
+            return
+
+        print(f"  Found {len(buttons_raw)} buttons, {len(behaviors_raw)} behavior instances")
+
+        # Build lookup maps
+        buttons_by_device_id = {}
+        buttons_by_id = {}
+
+        for button in buttons_raw:
+            button_id = button.get('id')
+            owner_rid = button.get('owner', {}).get('rid')
+
+            if button_id and owner_rid:
+                buttons_by_id[button_id] = button
+
+                if owner_rid not in buttons_by_device_id:
+                    buttons_by_device_id[owner_rid] = []
+                buttons_by_device_id[owner_rid].append(button)
+
+        # Sort buttons by control_id within each device
+        for device_id in buttons_by_device_id:
+            buttons_by_device_id[device_id].sort(
+                key=lambda b: b.get('metadata', {}).get('control_id', 0)
+            )
+
+        # Build behavior_instance lookup by device
+        behaviors_by_device_id = {}
+        for behavior in behaviors_raw:
+            device_rid = behavior.get('configuration', {}).get('device', {}).get('rid')
+            if device_rid:
+                behaviors_by_device_id[device_rid] = behavior
+
+        # Build rooms lookup
+        rooms_by_id = {room['id']: room for room in architecture['rooms']}
+
+        # Build scenes lookup (from all rooms and zones)
+        scenes_by_id = {}
+        for room in architecture['rooms']:
+            for scene in room.get('scenes', []):
+                scenes_by_id[scene['id']] = scene['name']
+        for zone in architecture['zones']:
+            for scene in zone.get('scenes', []):
+                scenes_by_id[scene['id']] = scene['name']
+
+        # Process each device
+        for device in architecture['devices']:
+            device_id = device.get('id')
+
+            # Skip non-switch devices
+            if not is_switch_device(device):
+                continue
+
+            # Look up behavior instance
+            behavior_instance = behaviors_by_device_id.get(device_id)
+            if not behavior_instance:
+                continue  # No button configuration for this switch
+
+            # Extract button configuration
+            try:
+                button_config = extract_button_configuration(
+                    behavior_instance,
+                    buttons_by_id,
+                    rooms_by_id,
+                    scenes_by_id
+                )
+
+                device['button_configuration'] = button_config
+                button_count = len(button_config.get('buttons', []))
+                print(f"  Device '{device['name']}': {button_count} buttons configured")
+
+            except Exception as e:
+                print(f"  WARNING: Failed to extract button config for '{device['name']}': {e}")
+                continue
+
+    except Exception as e:
+        print(f"  WARNING: Phase 4 failed: {e}")
+        print("  Continuing with Phases 1-3 data...")
+
+
 def export_to_yaml(architecture: Dict[str, Any], output_file: str = 'household_architecture.yaml') -> None:
     """
     Export architecture data to YAML file.
@@ -387,6 +649,9 @@ def main():
 
     # Phase 3: Scene Recipes
     phase_3_scene_recipes(architecture)
+
+    # Phase 4: Button Configuration Export
+    phase_4_button_configuration(architecture)
 
     # Export to YAML
     export_to_yaml(architecture)

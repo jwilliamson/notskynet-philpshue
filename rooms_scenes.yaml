@@ -1,0 +1,61 @@
+# rooms_scenes.yaml
+# Configuration for Philips Hue scene synchronization
+#
+# See ROOMS_SCENES_GUIDE.md for detailed documentation
+
+rooms:
+  - room_name: "Office Lights"
+    scenes:
+      # Bright scene - 100% brightness, warm white
+      - name: "Bright"
+        brightness: 100.0
+        color_temperature:
+          mirek: 233
+
+      # Focus scene - 100% brightness, cool white
+      - name: "Focus"
+        brightness: 100.0
+        color_temperature:
+          mirek: 200  # Cooler than Bright
+
+      # Relax scene - 56% brightness, very warm white
+      - name: "Relax"
+        brightness: 56.25
+        color_temperature:
+          mirek: 447  # Very warm
+
+      # Nightlight scene - 10% brightness, orange glow
+      - name: "Nightlight"
+        brightness: 10.0
+        color:
+          x: 0.5609999
+          y: 0.4042
+
+    # Switch configuration with per-button assignments
+    switches:
+      - device_name: "Office Light Switch"
+        model_type: "v1"
+        buttons:
+          - button_number: 1
+            action: "timezone"
+            target: "Office Lights"
+            time_slots:
+              - start_time:
+                  hour: 7
+                scene: "Bright"
+              - start_time:
+                  hour: 13
+                scene: "Focus"
+              - start_time:
+                  hour: 18
+                scene: "Relax"
+              - start_time:
+                  hour: 21
+                scene: "Nightlight"
+          - button_number: 2
+            action: "dim_up"
+          - button_number: 3
+            action: "dim_down"
+          - button_number: 4
+            action: "room_toggle"
+            target: "Office Lights"

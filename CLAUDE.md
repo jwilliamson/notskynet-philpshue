@@ -4,28 +4,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **read-only** Philips Hue Configuration-as-Code export system with two complementary tools:
+This is a Philips Hue Configuration-as-Code system with three complementary tools:
 
-1. **Household Architecture Export** - Complete state snapshot with scenes nested by room/zone
-2. **Scene Gallery Export** - Deduplicated scene configurations for DevOps workflows
+1. **Household Architecture Export** - Complete state snapshot with scenes nested by room/zone (read-only)
+2. **Scene Gallery Export** - Deduplicated scene configurations for DevOps workflows (read-only)
+3. **Scene Sync** - Declarative scene and switch management from YAML config (write operations)
 
-Both tools query a Hue Bridge via the CLIP API v2 and produce YAML files optimized for version control.
+The export tools query a Hue Bridge via the CLIP API v2 and produce YAML files optimized for version control. The sync tool applies declarative configurations to the bridge.
 
-**Key Principle**: These tools are strictly read-only. Never add POST/PUT/DELETE operations or modify bridge state.
+**Key Principle**: Export tools (1-2) are strictly read-only. Only sync_scenes.py performs write operations (POST/PUT/DELETE), and only when explicitly authorized via configuration.
 
-## Running the Exports
+## Running the Tools
 
 ```bash
 # Install dependencies
 pip install -r requirements.txt
 
+# === EXPORT TOOLS (read-only) ===
 # Run household architecture export (generates household_architecture.yaml)
 python export_hue_architecture.py
 
 # Run scene gallery export (generates scene_gallery.yaml)
 python export_scene_gallery.py
 
-# Both scripts are standalone and can be run independently
+# === SYNC TOOL (write operations) ===
+# Sync scenes from rooms_scenes.yaml to bridge
+python sync_scenes.py                  # Dry-run mode (safe)
+python sync_scenes.py --execute        # Execute changes (DESTRUCTIVE)
+python sync_scenes.py --execute --room "Office Lights"  # Single room only
+
+# See ROOMS_SCENES_GUIDE.md for configuration details
 ```
 
 ## Configuration
@@ -35,6 +43,36 @@ Required environment variables in `.env`:
 - `HUE_USERNAME` - API key (note: variable name is USERNAME, not API_KEY)
 
 ## Architecture
+
+### Scene Sync (`sync_scenes.py`)
+
+This tool synchronizes Hue room scenes and dimmer switch button configurations from a declarative YAML file (`rooms_scenes.yaml`).
+
+**Key Features:**
+
+- **Declarative Configuration**: Define scenes and switches in YAML
+- **Full Replacement Strategy**: Deletes all existing scenes in target rooms, creates new ones from config
+- **Automatic Light Resolution**: Scene settings apply to all lights in room (no manual light IDs needed)
+- **Switch Button Assignment**: Configures dimmer switches to cycle through room scenes
+- **Safety Mechanisms**: Dry-run by default, Pydantic validation, targeted room updates
+- **v1/v2 Switch Support**: Handles different button layouts for RWL021 and RWL022 switches
+
+**Operation:**
+
+1. Validates `rooms_scenes.yaml` configuration
+2. For each room: Queries existing scenes, deletes all, creates new scenes from config
+3. For each switch: Queries existing button configuration, deletes, creates new behavior_instance
+4. Assigns scenes to appropriate button (Button 1 for v1, Button 4 for v2)
+
+**Write Endpoints Used:**
+
+- `DELETE /clip/v2/resource/scene/{id}` - Remove existing scenes
+- `POST /clip/v2/resource/scene` - Create new scenes
+- `DELETE /clip/v2/resource/behavior_instance/{id}` - Remove switch configuration
+- `POST /clip/v2/resource/behavior_instance` - Create switch button mappings
+
+**Configuration Structure:**
+See [ROOMS_SCENES_GUIDE.md](ROOMS_SCENES_GUIDE.md) for detailed documentation.
 
 ### Household Architecture Export (`export_hue_architecture.py`)
 
