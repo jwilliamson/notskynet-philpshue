@@ -12,11 +12,13 @@ The `rooms_scenes.yaml` file allows you to declaratively define:
    - **Scene cycling** - Cycle through multiple scenes
    - **Dim up/down** - Adjust brightness
    - **Room toggle** - Turn lights on/off
+   - **Hold ON button (~1s)** - Button 1 automatically turns off ALL lights in the house (default behavior)
 
 When you run `sync_scenes.py --execute`, the script will:
 - **DELETE** all existing scenes in configured rooms
 - **CREATE** new scenes from your configuration
 - **CONFIGURE** dimmer switch buttons with your specified actions (timezone, scene_cycle, dim_up, dim_down, room_toggle)
+- **ENABLE** hold-to-turn-off-all functionality on button 1 (ON button)
 
 ⚠️ **WARNING**: This is a **destructive operation**. Always run in dry-run mode first (default) before using `--execute`.
 
@@ -394,6 +396,8 @@ Each button can be configured with one of five action types:
 4. **dim_down** - Decreases brightness when held
 5. **room_toggle** - Toggles room lights on/off
 
+**⚠️ Important: Button 1 (ON button) has a default hold action (~1 second) that turns off ALL lights in the house.** This provides an emergency "all off" capability.
+
 ### v1 Dimmer (RWL021)
 
 ```
@@ -439,26 +443,26 @@ Physical Switch:
 
 ### Action Behavior Details
 
-**Timezone Action:**
-- Short press: Activates scene for current time of day
-- Long press: Do nothing
+**Timezone Action (typically on button 1):**
+- **Short press**: Activates scene for current time of day
+- **Hold (~1s)**: Turns off ALL lights in the house (button 1 only)
 - Example: At 8am → "Bright", at 7pm → "Relax", at 10pm → "Nightlight"
 - Bridge automatically determines which scene to activate based on current time
 
-**Scene Cycle Action:**
-- Short press: Cycle to next scene (Scene 1 → Scene 2 → Scene 3 → Scene 1...)
-- Long press: Do nothing
+**Scene Cycle Action (typically on button 1 for v1 or button 4 for v2):**
+- **Short press**: Cycle to next scene (Scene 1 → Scene 2 → Scene 3 → Scene 1...)
+- **Hold (~1s)**: If on button 1, turns off ALL lights in the house; otherwise does nothing
 - 3-second timeout: If you don't press again within 3 seconds, cycle resets to first scene
 - Scenes cycle in the order specified in the `scenes:` list
 
-**Dim Up/Down Actions:**
-- Hold button: Continuously adjust brightness
-- Release: Stop adjustment
+**Dim Up/Down Actions (typically on buttons 2 and 3):**
+- **Hold button**: Continuously adjust brightness
+- **Release**: Stop adjustment
 - Works on all lights in the switch's room
 
-**Room Toggle Action:**
-- Short press: Turn lights on (to last state) or off
-- Long press: Do nothing
+**Room Toggle Action (typically on button 4 for v1 or button 1 for v2):**
+- **Short press**: Turn lights on (to last state) or off
+- **Hold (~1s)**: If on button 1, turns off ALL lights in the house; otherwise does nothing
 - Can target any room or zone, not just the switch's room
 
 ---

@@ -832,6 +832,43 @@ class HueAPIClient:
 
         return self._request("POST", "behavior_instance", json_data=body)
 
+    def _build_long_press_config(
+        self,
+        button_number: int,
+        room_lookup: Dict[str, str]
+    ) -> Dict[str, Any]:
+        """
+        Build on_long_press configuration for button.
+
+        Button 1 (ON button) turns off all house lights when held.
+        All other buttons do nothing on hold.
+
+        Args:
+            button_number: Button number (1-4)
+            room_lookup: Room name to ID mapping (for all_lights_off)
+
+        Returns:
+            Dictionary with on_long_press configuration
+        """
+        # Only button 1 (ON button) has hold-to-turn-off-all functionality
+        if button_number == 1:
+            # Build where clause targeting ALL rooms
+            where_clause = [
+                {"group": {"rid": room_id, "rtype": "room"}}
+                for room_id in room_lookup.values()
+            ]
+
+            return {
+                "recall_single_extended": {
+                    "actions": [{"action": "off"}],
+                    "with_off": {"enabled": True}
+                },
+                "where": where_clause
+            }
+
+        # All other buttons: do nothing on hold
+        return {"action": "do_nothing"}
+
     def create_behavior_instance_v2(
         self,
         device_id: str,
@@ -890,6 +927,14 @@ class HueAPIClient:
                             "minute": time_slot.start_time['minute']
                         }
                     })
+
+                # Build long press configuration and merge where clauses
+                long_press_dict = self._build_long_press_config(button_cfg.button_number, room_lookup)
+                where_clause = [{"group": {"rid": target_id, "rtype": target_rtype}}]
+                if "where" in long_press_dict:
+                    # Merge: add all-rooms to existing room target
+                    where_clause.extend(long_press_dict.pop("where"))
+
                 buttons_config[button_id] = {
                     "on_short_release": {
                         "time_based_extended": {
@@ -897,8 +942,8 @@ class HueAPIClient:
                             "with_off": {"enabled": True}
                         }
                     },
-                    "on_long_press": {"action": "do_nothing"},
-                    "where": [{"group": {"rid": target_id, "rtype": target_rtype}}]
+                    "on_long_press": long_press_dict,
+                    "where": where_clause
                 }
 
             elif button_cfg.action == 'scene_cycle':
@@ -908,6 +953,13 @@ class HueAPIClient:
                 for scene_name in button_cfg.scenes:
                     scene_id = scene_name_to_id[scene_name]
                     scene_slots.append([{"action": {"recall": {"rid": scene_id, "rtype": "scene"}}}])
+
+                # Build long press configuration and merge where clauses
+                long_press_dict = self._build_long_press_config(button_cfg.button_number, room_lookup)
+                where_clause = [{"group": {"rid": target_id, "rtype": target_rtype}}]
+                if "where" in long_press_dict:
+                    where_clause.extend(long_press_dict.pop("where"))
+
                 buttons_config[button_id] = {
                     "on_short_release": {
                         "scene_cycle_extended": {
@@ -916,20 +968,33 @@ class HueAPIClient:
                             "with_off": {"enabled": False}
                         }
                     },
-                    "on_long_press": {"action": "do_nothing"},
-                    "where": [{"group": {"rid": target_id, "rtype": target_rtype}}]
+                    "on_long_press": long_press_dict,
+                    "where": where_clause
                 }
 
             elif button_cfg.action in {'dim_up', 'dim_down'}:
                 # Dim buttons use implicit room context
+                long_press_dict = self._build_long_press_config(button_cfg.button_number, room_lookup)
+                where_clause = [{"group": {"rid": room_id, "rtype": "room"}}]
+                if "where" in long_press_dict:
+                    where_clause.extend(long_press_dict.pop("where"))
+
                 buttons_config[button_id] = {
                     "on_repeat": {"action": button_cfg.action},
-                    "where": [{"group": {"rid": room_id, "rtype": "room"}}]
+                    "on_long_press": long_press_dict,
+                    "where": where_clause
                 }
 
             elif button_cfg.action == 'room_toggle':
                 # Room toggle configuration
                 target_id, target_rtype = self._resolve_target(button_cfg.target, room_lookup, zone_lookup)
+
+                # Build long press configuration and merge where clauses
+                long_press_dict = self._build_long_press_config(button_cfg.button_number, room_lookup)
+                where_clause = [{"group": {"rid": target_id, "rtype": target_rtype}}]
+                if "where" in long_press_dict:
+                    where_clause.extend(long_press_dict.pop("where"))
+
                 buttons_config[button_id] = {
                     "on_short_release": {
                         "recall_single_extended": {
@@ -937,8 +1002,8 @@ class HueAPIClient:
                             "with_off": {"enabled": True}
                         }
                     },
-                    "on_long_press": {"action": "do_nothing"},
-                    "where": [{"group": {"rid": target_id, "rtype": target_rtype}}]
+                    "on_long_press": long_press_dict,
+                    "where": where_clause
                 }
 
         # Build final behavior_instance body
@@ -1340,6 +1405,11 @@ def sync_switches_for_room(
                     logger.info(f"  Button {button_cfg.button_number}: room_toggle ({button_cfg.target})")
                 else:
                     logger.info(f"  Button {button_cfg.button_number}: {button_cfg.action}")
+
+                # Log long press action (only button 1 has hold-to-turn-off-all)
+                if button_cfg.button_number == 1:
+                    num_rooms = len(room_lookup)
+                    logger.info(f"      Hold: ALL LIGHTS OFF ({num_rooms} rooms)")
         else:
             logger.info(f"Creating button configuration:")
             for button_cfg in switch_config.buttons:
@@ -1355,6 +1425,11 @@ def sync_switches_for_room(
                     logger.info(f"  Button {button_cfg.button_number}: room_toggle ({button_cfg.target})")
                 else:
                     logger.info(f"  Button {button_cfg.button_number}: {button_cfg.action}")
+
+                # Log long press action (only button 1 has hold-to-turn-off-all)
+                if button_cfg.button_number == 1:
+                    num_rooms = len(room_lookup)
+                    logger.info(f"      Hold: ALL LIGHTS OFF ({num_rooms} rooms)")
 
             result = client.create_behavior_instance_v2(
                 device_id=device_id,
