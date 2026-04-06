@@ -400,6 +400,30 @@ class HueAPIClient:
         body = self._build_scene_body(room_id, scene_config)
         return self._request("POST", "scene", json_data=body)
 
+    def update_scene(self, scene_id: str, room_id: str, scene_config: SceneConfig) -> Dict[str, Any]:
+        """
+        Update an existing scene with new configuration.
+
+        Args:
+            scene_id: Scene UUID to update
+            room_id: Room UUID (needed to resolve lights)
+            scene_config: New scene configuration
+
+        Returns:
+            Update confirmation from API
+
+        Raises:
+            HueAPIError: If PUT request fails (404 = scene deleted externally)
+
+        Note:
+            The group field must be excluded from PUT requests as the API
+            does not allow modifying group references in scene updates.
+        """
+        body = self._build_scene_body(room_id, scene_config)
+        # Remove 'group' field - API doesn't allow modifying group reference in updates
+        body.pop('group', None)
+        return self._request("PUT", f"scene/{scene_id}", json_data=body)
+
     def _build_scene_body(self, room_id: str, scene_config: SceneConfig) -> Dict[str, Any]:
         """
         Build POST /scene request body from SceneConfig.
@@ -450,6 +474,148 @@ class HueAPIClient:
             "group": {"rid": room_id, "rtype": "room"},
             "actions": actions
         }
+
+    @staticmethod
+    def _floats_equal(a: float, b: float, tolerance: float = 0.01) -> bool:
+        """
+        Compare floats with tolerance for floating point precision.
+
+        Args:
+            a: First float value
+            b: Second float value
+            tolerance: Maximum difference to consider equal (default 0.01)
+
+        Returns:
+            True if values are within tolerance, False otherwise
+        """
+        return abs(a - b) < tolerance
+
+    def _compare_scene_to_config(
+        self,
+        existing_scene: Dict[str, Any],
+        scene_config: SceneConfig,
+        room_id: str
+    ) -> tuple[bool, List[str]]:
+        """
+        Compare existing scene with config to detect changes.
+
+        Args:
+            existing_scene: Scene data from GET /scene (includes actions array)
+            scene_config: SceneConfig from YAML
+            room_id: Room UUID (to validate action count)
+
+        Returns:
+            Tuple of (is_equal, list_of_differences)
+            - is_equal: True if scene matches config exactly
+            - list_of_differences: Human-readable list of what changed
+        """
+        differences = []
+
+        try:
+            # Get current lights in room to validate action count
+            light_ids = self.get_lights_for_room(room_id)
+            existing_actions = existing_scene.get('actions', [])
+
+            # Check action count matches current light count
+            if len(existing_actions) != len(light_ids):
+                differences.append(
+                    f"action count: {len(existing_actions)} → {len(light_ids)} "
+                    f"(lights changed in room)"
+                )
+                return (False, differences)
+
+            # If no actions, scene is malformed
+            if not existing_actions:
+                return (False, ["no actions found (malformed scene)"])
+
+            # Extract values from first action (all should be identical)
+            first_action = existing_actions[0].get('action', {})
+
+            # Extract existing brightness
+            existing_brightness = first_action.get('dimming', {}).get('brightness')
+
+            # Extract existing color (xy or mirek)
+            existing_color_xy = first_action.get('color', {}).get('xy')
+            existing_mirek = first_action.get('color_temperature', {}).get('mirek')
+
+            # Compare brightness
+            if scene_config.brightness is not None:
+                if existing_brightness is None:
+                    differences.append(f"brightness: None → {scene_config.brightness}")
+                elif not self._floats_equal(existing_brightness, scene_config.brightness, 0.01):
+                    differences.append(
+                        f"brightness: {existing_brightness:.1f} → {scene_config.brightness:.1f}"
+                    )
+            elif existing_brightness is not None:
+                differences.append(f"brightness: {existing_brightness:.1f} → None")
+
+            # Compare color mode and values
+            if scene_config.color is not None:
+                # Config uses color xy
+                if existing_color_xy is None:
+                    # Existing uses mirek or no color - mode change
+                    if existing_mirek is not None:
+                        differences.append("color mode: mirek → xy")
+                        differences.append(
+                            f"color: None → xy({scene_config.color.x:.4f}, {scene_config.color.y:.4f})"
+                        )
+                    else:
+                        differences.append(
+                            f"color: None → xy({scene_config.color.x:.4f}, {scene_config.color.y:.4f})"
+                        )
+                else:
+                    # Both use color xy - compare values
+                    existing_x = existing_color_xy.get('x')
+                    existing_y = existing_color_xy.get('y')
+
+                    if not (self._floats_equal(existing_x, scene_config.color.x, 0.0001) and
+                            self._floats_equal(existing_y, scene_config.color.y, 0.0001)):
+                        differences.append(
+                            f"color xy: ({existing_x:.4f}, {existing_y:.4f}) → "
+                            f"({scene_config.color.x:.4f}, {scene_config.color.y:.4f})"
+                        )
+
+            elif scene_config.color_temperature is not None:
+                # Config uses color temperature (mirek)
+                if existing_mirek is None:
+                    # Existing uses xy or no color - mode change
+                    if existing_color_xy is not None:
+                        differences.append("color mode: xy → mirek")
+                        differences.append(
+                            f"color_temperature: None → {scene_config.color_temperature.mirek} mirek"
+                        )
+                    else:
+                        differences.append(
+                            f"color_temperature: None → {scene_config.color_temperature.mirek} mirek"
+                        )
+                else:
+                    # Both use mirek - compare values (exact match for integers)
+                    if existing_mirek != scene_config.color_temperature.mirek:
+                        differences.append(
+                            f"color_temperature: {existing_mirek} → "
+                            f"{scene_config.color_temperature.mirek} mirek"
+                        )
+
+            else:
+                # Config has no color - check if existing has color
+                if existing_color_xy is not None:
+                    existing_x = existing_color_xy.get('x')
+                    existing_y = existing_color_xy.get('y')
+                    differences.append(
+                        f"color xy: ({existing_x:.4f}, {existing_y:.4f}) → None"
+                    )
+                elif existing_mirek is not None:
+                    differences.append(f"color_temperature: {existing_mirek} mirek → None")
+
+            # Return results
+            return (len(differences) == 0, differences)
+
+        except (KeyError, TypeError, AttributeError) as e:
+            # Malformed scene data - mark as different
+            return (False, [f"malformed scene data: {e}"])
+        except HueAPIError as e:
+            # API error during comparison - re-raise
+            raise HueAPIError(f"Cannot compare scene without room light data: {e}")
 
     def get_devices(self) -> List[Dict[str, Any]]:
         """
@@ -1248,37 +1414,77 @@ def sync_room(
     existing_scenes = client.get_scenes_for_room(room_id)
     logger.info(f"Found {len(existing_scenes)} existing scene(s)")
 
-    # Delete phase
-    if existing_scenes:
-        for scene in existing_scenes:
-            scene_name = scene.get('metadata', {}).get('name', 'Unknown')
-            scene_id = scene.get('id')
-
-            if dry_run:
-                logger.info(f"[DRY-RUN] Would delete: {scene_name} (ID: {scene_id})")
-            else:
-                logger.info(f"Deleting: {scene_name}")
-                client.delete_scene(scene_id)
-    else:
-        logger.info("No existing scenes to delete")
-
-    # Create phase - track created scene IDs for switch assignment
-    logger.info(f"Creating {len(room_config.scenes)} new scene(s)")
-    created_scene_ids = []
-
-    for scene_config in room_config.scenes:
-        if dry_run:
-            logger.info(f"[DRY-RUN] Would create: {scene_config.name} (applies to {light_count} light(s))")
-            logger.debug(f"  Settings: Brightness={scene_config.brightness}, "
-                       f"Color={scene_config.color}, ColorTemp={scene_config.color_temperature}")
-            # For dry-run, use placeholder IDs
-            created_scene_ids.append(f"placeholder-scene-{len(created_scene_ids)}")
+    # Build lookup of existing scenes by name
+    existing_by_name = {}
+    for scene in existing_scenes:
+        scene_name = scene.get('metadata', {}).get('name', 'Unknown')
+        if scene_name in existing_by_name:
+            logger.warning(
+                f"Duplicate scene name '{scene_name}' found in room "
+                f"(IDs: {existing_by_name[scene_name]['id']}, {scene['id']}) - "
+                f"using first match, will delete duplicate"
+            )
         else:
-            logger.info(f"Creating: {scene_config.name} (applies to {light_count} light(s))")
-            result = client.create_scene(room_id, scene_config)
-            new_scene_id = result.get('data', [{}])[0].get('rid', 'unknown')
-            created_scene_ids.append(new_scene_id)
-            logger.debug(f"Created scene ID: {new_scene_id}")
+            existing_by_name[scene_name] = scene
+
+    # Track matched scene IDs (to delete unmatched) and created scene IDs (for switch integration)
+    matched_scene_ids = set()
+    created_scene_ids = []  # Preserves order for build_scene_name_to_id_map()
+
+    # Process each config scene - SKIP/UPDATE/CREATE
+    for scene_config in room_config.scenes:
+        scene_name = scene_config.name
+
+        if scene_name in existing_by_name:
+            # Scene exists - compare configuration
+            existing_scene = existing_by_name[scene_name]
+            scene_id = existing_scene.get('id')
+
+            is_equal, differences = client._compare_scene_to_config(
+                existing_scene, scene_config, room_id
+            )
+
+            if is_equal:
+                # [SKIP] - No changes needed
+                prefix = "[DRY-RUN] " if dry_run else ""
+                logger.info(f"{prefix}[SKIP] {scene_name} (already matches config)")
+                matched_scene_ids.add(scene_id)
+                created_scene_ids.append(scene_id)
+            else:
+                # [UPDATE] - Differences found
+                diff_summary = ", ".join(differences)
+                prefix = "[DRY-RUN] " if dry_run else ""
+                logger.info(f"{prefix}[UPDATE] {scene_name} → {diff_summary}")
+                if not dry_run:
+                    client.update_scene(scene_id, room_id, scene_config)
+                    logger.debug(f"Updated scene ID: {scene_id}")
+                matched_scene_ids.add(scene_id)
+                created_scene_ids.append(scene_id)
+        else:
+            # [CREATE] - Scene doesn't exist
+            prefix = "[DRY-RUN] " if dry_run else ""
+            logger.info(f"{prefix}[CREATE] {scene_name} (applies to {light_count} light(s))")
+            if dry_run:
+                # For dry-run, use placeholder IDs
+                placeholder_id = f"placeholder-scene-{len(created_scene_ids)}"
+                created_scene_ids.append(placeholder_id)
+            else:
+                result = client.create_scene(room_id, scene_config)
+                new_scene_id = result.get('data', [{}])[0].get('rid', 'unknown')
+                created_scene_ids.append(new_scene_id)
+                logger.debug(f"Created scene ID: {new_scene_id}")
+
+    # Delete unmatched existing scenes (not in config)
+    for scene in existing_scenes:
+        scene_name = scene.get('metadata', {}).get('name', 'Unknown')
+        scene_id = scene.get('id')
+
+        if scene_id not in matched_scene_ids:
+            # [DELETE] - Scene exists on bridge but not in config
+            prefix = "[DRY-RUN] " if dry_run else ""
+            logger.info(f"{prefix}[DELETE] {scene_name} (not in config)")
+            if not dry_run:
+                client.delete_scene(scene_id)
 
     logger.info(f"✓ Completed scenes for: {room_name}")
 
