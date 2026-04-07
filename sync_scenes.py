@@ -38,7 +38,7 @@ import argparse
 import logging
 import os
 import sys
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Union
 
 import requests
 import urllib3
@@ -63,20 +63,15 @@ class ColorTemperature(BaseModel):
 
 
 class SceneConfig(BaseModel):
-    """Scene definition with name and light settings (applies to all lights in room)."""
+    """Scene definition with name and light settings (applies to all lights in room).
+
+    Settings can be provided explicitly or looked up from scene_gallery.yaml.
+    Gallery enrichment happens during sync_room() processing.
+    """
     name: str = Field(..., min_length=1, max_length=100, description="Scene name")
     brightness: Optional[float] = Field(None, ge=0.0, le=100.0, description="Brightness 0-100")
     color: Optional[ColorXY] = Field(None, description="XY color coordinates")
     color_temperature: Optional[ColorTemperature] = Field(None, description="Color temperature")
-
-    @field_validator('color_temperature')
-    @classmethod
-    def validate_at_least_one_setting(cls, v, info):
-        """Ensure at least one of brightness, color, or color_temperature is set."""
-        data = info.data
-        if data.get('brightness') is None and data.get('color') is None and v is None:
-            raise ValueError("Must provide at least one of: brightness, color, color_temperature")
-        return v
 
 
 class TimeSlot(BaseModel):
@@ -245,10 +240,32 @@ class SwitchConfig(BaseModel):
 
 
 class RoomConfig(BaseModel):
-    """Room configuration with associated scenes."""
+    """Room configuration with associated scenes.
+
+    Scenes can be specified as:
+    - String: "Rest" (pure gallery reference)
+    - Object: {name: "Rest"} (gallery reference)
+    - Object with overrides: {name: "Rest", brightness: 50.0} (gallery + override)
+    """
     room_name: str = Field(..., min_length=1, description="Room name (must match Hue Bridge)")
-    scenes: List[SceneConfig] = Field(..., min_length=1, description="Scenes for this room")
+    scenes: List[Union[str, SceneConfig]] = Field(..., min_length=1, description="Scenes for this room")
     switches: Optional[List[SwitchConfig]] = Field(default=None, description="Dimmer switch configurations")
+
+    @field_validator('scenes', mode='before')
+    @classmethod
+    def normalize_scenes(cls, v):
+        """Convert string scene names to SceneConfig objects."""
+        if not isinstance(v, list):
+            return v
+
+        normalized = []
+        for item in v:
+            if isinstance(item, str):
+                # Convert string to SceneConfig object
+                normalized.append({'name': item})
+            else:
+                normalized.append(item)
+        return normalized
 
     @field_validator('switches')
     @classmethod
@@ -1131,6 +1148,11 @@ def parse_args() -> argparse.Namespace:
         help="Only sync specific room name (filters config)"
     )
     parser.add_argument(
+        '--gallery',
+        default='scene_gallery.yaml',
+        help="Path to scene gallery YAML file (default: scene_gallery.yaml)"
+    )
+    parser.add_argument(
         '--verbose', '-v',
         action='store_true',
         help="Enable verbose logging (DEBUG level)"
@@ -1181,6 +1203,144 @@ def load_config(config_path: str, logger: logging.Logger) -> RoomsScenesConfig:
     except ValidationError as e:
         logger.error(f"Config validation failed:\n{e}")
         sys.exit(1)
+
+
+def load_scene_gallery(gallery_path: str, logger: logging.Logger) -> Dict[str, Any]:
+    """
+    Load scene_gallery.yaml for reference lookups.
+
+    Args:
+        gallery_path: Path to gallery YAML file
+        logger: Logger instance
+
+    Returns:
+        Gallery data dictionary with 'metadata' and 'scenes' keys.
+        Returns empty structure if file not found (non-fatal).
+    """
+    try:
+        with open(gallery_path, 'r') as f:
+            gallery_data = yaml.safe_load(f)
+        total_scenes = gallery_data.get('metadata', {}).get('total_scenes', 0)
+        logger.debug(f"Loaded gallery from {gallery_path}: {total_scenes} unique scenes")
+        return gallery_data
+    except FileNotFoundError:
+        logger.warning(f"Gallery file not found: {gallery_path} - scene references will require explicit values")
+        return {"metadata": {}, "scenes": []}
+    except yaml.YAMLError as e:
+        logger.warning(f"Gallery YAML parsing error: {e} - scene references will require explicit values")
+        return {"metadata": {}, "scenes": []}
+
+
+def build_gallery_lookup(gallery_data: Dict[str, Any], logger: logging.Logger) -> Dict[str, Dict[str, Any]]:
+    """
+    Build lookup map from scene name to configuration.
+    For scenes with variations, uses the first variation.
+
+    Args:
+        gallery_data: Loaded gallery data from load_scene_gallery()
+        logger: Logger instance
+
+    Returns:
+        Dictionary mapping scene name to {brightness, color, color_temperature}
+    """
+    lookup = {}
+    scenes = gallery_data.get("scenes", [])
+
+    for scene in scenes:
+        name = scene.get("name")
+        if not name:
+            continue
+
+        # Check if scene has variations (multiple configs)
+        if "variations" in scene:
+            # Use first variation
+            config = scene["variations"][0].copy()
+            logger.debug(f"Gallery scene '{name}': using first variation (scene has {len(scene['variations'])} variations)")
+        else:
+            # Single configuration - extract relevant fields
+            config = {}
+            if "brightness" in scene:
+                config["brightness"] = scene["brightness"]
+            if "color" in scene:
+                config["color"] = scene["color"]
+            if "color_temperature" in scene:
+                config["color_temperature"] = scene["color_temperature"]
+
+        lookup[name] = config
+
+    logger.info(f"Built gallery lookup: {len(lookup)} scenes available for reference")
+    return lookup
+
+
+def enrich_scene_from_gallery(
+    scene_config: SceneConfig,
+    gallery_lookup: Dict[str, Dict[str, Any]],
+    logger: logging.Logger
+) -> SceneConfig:
+    """
+    Enrich scene configuration with gallery defaults for missing fields.
+    Explicit values in scene_config take priority over gallery.
+
+    Args:
+        scene_config: Original scene configuration from rooms_scenes.yaml
+        gallery_lookup: Gallery lookup map from build_gallery_lookup()
+        logger: Logger instance
+
+    Returns:
+        Enriched SceneConfig with gallery defaults applied
+
+    Raises:
+        ValueError: If no values provided and scene not found in gallery
+    """
+    # Check if scene needs enrichment (has any None values)
+    needs_enrichment = (
+        scene_config.brightness is None or
+        scene_config.color is None and scene_config.color_temperature is None
+    )
+
+    if not needs_enrichment:
+        # Fully specified - no gallery lookup needed
+        logger.debug(f"Scene '{scene_config.name}': using explicit values (no gallery lookup)")
+        return scene_config
+
+    # Look up gallery entry
+    gallery_config = gallery_lookup.get(scene_config.name)
+    if not gallery_config:
+        # Not in gallery and not fully specified - error
+        raise ValueError(
+            f"Scene '{scene_config.name}' not fully specified and not found in gallery. "
+            f"Either provide all values or add scene to scene_gallery.yaml"
+        )
+
+    # Apply gallery defaults for missing fields
+    enriched_data = scene_config.model_dump()
+    sources = []
+
+    if enriched_data["brightness"] is None and "brightness" in gallery_config:
+        enriched_data["brightness"] = gallery_config["brightness"]
+        sources.append("brightness")
+
+    if enriched_data["color"] is None and enriched_data["color_temperature"] is None:
+        if "color" in gallery_config:
+            # Gallery has color xy - convert to ColorXY model
+            color_data = gallery_config["color"]
+            if "xy" in color_data:
+                enriched_data["color"] = ColorXY(x=color_data["xy"][0], y=color_data["xy"][1])
+            elif "x" in color_data and "y" in color_data:
+                enriched_data["color"] = ColorXY(x=color_data["x"], y=color_data["y"])
+            sources.append("color")
+        elif "color_temperature" in gallery_config:
+            # Gallery has mirek
+            enriched_data["color_temperature"] = ColorTemperature(
+                mirek=gallery_config["color_temperature"]["mirek"]
+            )
+            sources.append("color_temperature")
+
+    if sources:
+        logger.info(f"Scene '{scene_config.name}': enriched from gallery ({', '.join(sources)})")
+
+    # Create new SceneConfig with enriched data
+    return SceneConfig(**enriched_data)
 
 
 def validate_credentials(bridge_ip: Optional[str], api_key: Optional[str], logger: logging.Logger) -> None:
@@ -1473,6 +1633,7 @@ def sync_room(
     room_config: RoomConfig,
     room_name_to_id: Dict[str, str],
     zone_name_to_id: Dict[str, str],
+    gallery_lookup: Dict[str, Dict[str, Any]],
     dry_run: bool,
     logger: logging.Logger
 ) -> None:
@@ -1484,12 +1645,14 @@ def sync_room(
         room_config: Room configuration
         room_name_to_id: Room name to ID mapping
         zone_name_to_id: Zone name to ID mapping
+        gallery_lookup: Gallery lookup map for scene enrichment
         dry_run: If True, only log actions without executing
         logger: Logger instance
 
     Raises:
         RoomNotFoundError: If room name not found on bridge
         HueAPIError: If API call fails
+        ValueError: If scene enrichment fails
     """
     room_name = room_config.room_name
     logger.info(f"\n--- Processing: {room_name} ---")
@@ -1500,6 +1663,19 @@ def sync_room(
         raise RoomNotFoundError(f"Room '{room_name}' not found on bridge")
 
     logger.debug(f"Resolved '{room_name}' to ID: {room_id}")
+
+    # Enrich scenes with gallery defaults
+    enriched_scenes = []
+    for scene_config in room_config.scenes:
+        try:
+            enriched_scene = enrich_scene_from_gallery(scene_config, gallery_lookup, logger)
+            enriched_scenes.append(enriched_scene)
+        except ValueError as e:
+            logger.error(f"Scene enrichment failed: {e}")
+            raise
+
+    # Replace original scenes with enriched versions
+    room_config.scenes = enriched_scenes
 
     # Query lights in the room
     light_ids = client.get_lights_for_room(room_id)
@@ -1783,6 +1959,10 @@ def main() -> None:
     # Load and validate YAML config
     config = load_config(args.config, logger)
 
+    # Load scene gallery for reference lookups
+    gallery_data = load_scene_gallery(args.gallery, logger)
+    gallery_lookup = build_gallery_lookup(gallery_data, logger)
+
     # Filter by --room if specified
     rooms_to_sync = config.rooms
     if args.room:
@@ -1829,13 +2009,16 @@ def main() -> None:
 
     for room_config in rooms_to_sync:
         try:
-            sync_room(client, room_config, room_name_to_id, zone_name_to_id, dry_run, logger)
+            sync_room(client, room_config, room_name_to_id, zone_name_to_id, gallery_lookup, dry_run, logger)
             results['success'].append(room_config.room_name)
         except RoomNotFoundError as e:
             logger.error(f"Room '{room_config.room_name}' not found - skipping")
             results['skipped'].append(room_config.room_name)
         except TargetNotFoundError as e:
             logger.error(f"Target resolution failed for '{room_config.room_name}': {e}")
+            results['errors'].append(room_config.room_name)
+        except ValueError as e:
+            logger.error(f"Configuration error for '{room_config.room_name}': {e}")
             results['errors'].append(room_config.room_name)
         except HueAPIError as e:
             logger.error(f"Failed to sync '{room_config.room_name}': {e}")
