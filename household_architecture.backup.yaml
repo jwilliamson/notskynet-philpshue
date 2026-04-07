@@ -1,0 +1,2786 @@
+rooms:
+- id: 2555b1b6-16ca-4490-bebb-8cfd61ec6500
+  name: Hallway Lights
+  archetype: hallway
+  lights:
+  - id: afe2dda7-8827-40e8-a30a-042372da14e0
+    name: Hallway light
+    'on': false
+    brightness: 56.1
+    color:
+      xy:
+      - 0.5013
+      - 0.4152
+  scenes:
+  - id: 3ef880a2-d274-402a-894b-32f7b6580c3d
+    name: Bright
+    actions:
+    - target: afe2dda7-8827-40e8-a30a-042372da14e0
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+  - id: 419c765f-0a65-4f8f-9039-f260705c4f6f
+    name: Nightlight
+    actions:
+    - target: afe2dda7-8827-40e8-a30a-042372da14e0
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: 84775cd8-8bc9-450e-9d2e-76ebf7a27b97
+    name: Relax
+    actions:
+    - target: afe2dda7-8827-40e8-a30a-042372da14e0
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+  - id: 972ccb5f-9e10-4a9b-93f3-ec1850f0c73f
+    name: Dimmed
+    actions:
+    - target: afe2dda7-8827-40e8-a30a-042372da14e0
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+  - id: b1ad0529-fbd9-408f-b8ca-40b8c4efd2f7
+    name: Read
+    actions:
+    - target: afe2dda7-8827-40e8-a30a-042372da14e0
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+  - id: d2d245ad-48f4-454f-9f60-2b5fe8e68d31
+    name: Rest
+    actions:
+    - target: afe2dda7-8827-40e8-a30a-042372da14e0
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: fd9ec2dd-453b-4d2b-b73c-27e28da2a7a4
+    name: Super nightlight
+    actions:
+    - target: afe2dda7-8827-40e8-a30a-042372da14e0
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.6217999
+            y: 0.3606
+- id: 2f5ddfb1-b55a-4433-ad36-55f72c1109ba
+  name: Bedroom Lights
+  archetype: living_room
+  lights:
+  - id: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+    name: Bedroom light
+    'on': false
+    brightness: 9.9
+    color:
+      xy:
+      - 0.5612
+      - 0.4042
+  - id: fbea6af9-f01c-4968-afd8-13ec1653badf
+    name: Jamie's bed side lamp
+    'on': false
+    brightness: 35.2
+    color:
+      xy:
+      - 0.5612
+      - 0.4042
+  - id: 4755c9c3-79fd-4226-a050-cf29c55702c4
+    name: Mels bed side lamp
+    'on': false
+    brightness: 35.2
+    color:
+      xy:
+      - 0.5612
+      - 0.4042
+  scenes:
+  - id: 009a1209-24df-4104-89dd-5cbff319fd97
+    name: Rest
+    actions:
+    - target: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: fbea6af9-f01c-4968-afd8-13ec1653badf
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 4755c9c3-79fd-4226-a050-cf29c55702c4
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: 6e23bd79-8c3a-44db-b172-463f55e71e9d
+    name: Read
+    actions:
+    - target: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: fbea6af9-f01c-4968-afd8-13ec1653badf
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 4755c9c3-79fd-4226-a050-cf29c55702c4
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+  - id: bf165d3c-61e0-4ad7-a3c0-6b422240fd7b
+    name: Nightlight
+    actions:
+    - target: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: fbea6af9-f01c-4968-afd8-13ec1653badf
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 0.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 4755c9c3-79fd-4226-a050-cf29c55702c4
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 0.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: c7d1f8a9-1388-4edf-b881-baef41e6f7a1
+    name: Relax
+    actions:
+    - target: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: fbea6af9-f01c-4968-afd8-13ec1653badf
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 4755c9c3-79fd-4226-a050-cf29c55702c4
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+- id: 4b5c0c64-109a-4378-95ae-f97a81058197
+  name: Landing Lights
+  archetype: hallway
+  lights:
+  - id: df604b1e-eb9b-42ff-bbab-66cfc48383f2
+    name: Landing light
+    'on': false
+    brightness: 100.0
+    color:
+      xy:
+      - 0.4431
+      - 0.4061
+  scenes:
+  - id: 4b88cba9-3384-41da-ae94-f1081b86f82c
+    name: Nightlight
+    actions:
+    - target: df604b1e-eb9b-42ff-bbab-66cfc48383f2
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: 5ee83409-397e-4b79-ae1c-eede784b03f3
+    name: Dimmed
+    actions:
+    - target: df604b1e-eb9b-42ff-bbab-66cfc48383f2
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+  - id: 7c8fbe06-0b22-44cb-927a-e1260bad21f7
+    name: Rest
+    actions:
+    - target: df604b1e-eb9b-42ff-bbab-66cfc48383f2
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: b4b0d83b-708c-4296-ad42-0fee71204f0f
+    name: Bright
+    actions:
+    - target: df604b1e-eb9b-42ff-bbab-66cfc48383f2
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+  - id: bff5c28b-4999-4e21-89a6-f2d28f9dd46d
+    name: Relax
+    actions:
+    - target: df604b1e-eb9b-42ff-bbab-66cfc48383f2
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+  - id: e6a51719-7ea5-43ab-b6a9-4812d3fb1af9
+    name: Read
+    actions:
+    - target: df604b1e-eb9b-42ff-bbab-66cfc48383f2
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+  - id: fa739a6c-31a6-4844-96c3-c3a61861d1e4
+    name: Super nightlight
+    actions:
+    - target: df604b1e-eb9b-42ff-bbab-66cfc48383f2
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 9.88
+        color:
+          xy:
+            x: 0.6217999
+            y: 0.3606
+- id: 4e85463f-4fb0-4169-83ce-6eba8ba01063
+  name: Visitor Bedroom Lights
+  archetype: bedroom
+  lights:
+  - id: 77167ec3-215b-4a88-a6f0-52c8e2a8acc9
+    name: Visitor bedroom light
+    'on': false
+    brightness: 9.9
+    color:
+      xy:
+      - 0.5612
+      - 0.4042
+  scenes:
+  - id: 6f2d5d92-bc78-43c2-b400-24aa0d7ae7a9
+    name: Relax
+    actions:
+    - target: 77167ec3-215b-4a88-a6f0-52c8e2a8acc9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+  - id: 8c6edca9-7fb4-4836-90bd-e5ceb722c7c8
+    name: Read
+    actions:
+    - target: 77167ec3-215b-4a88-a6f0-52c8e2a8acc9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+  - id: 94425df2-6224-4eba-a005-8710c7ed1961
+    name: Dimmed
+    actions:
+    - target: 77167ec3-215b-4a88-a6f0-52c8e2a8acc9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+  - id: bded5d16-1fef-45d2-8905-3a429669a390
+    name: Super night light
+    actions:
+    - target: 77167ec3-215b-4a88-a6f0-52c8e2a8acc9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 3.56
+        color:
+          xy:
+            x: 0.6217999
+            y: 0.3606
+  - id: facd2ecf-df26-4a83-b3ea-88e8ccfcd45e
+    name: Nightlight
+    actions:
+    - target: 77167ec3-215b-4a88-a6f0-52c8e2a8acc9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+- id: 877d1f8e-5c3c-489e-93e1-01af160d3093
+  name: Kitchen Lights
+  archetype: kitchen
+  lights:
+  - id: e328723f-d8c9-43a1-b4e8-313ca5691427
+    name: Kitchen light back 1
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  - id: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+    name: Kitchen light back 2
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  - id: daeabedf-8506-4c22-b348-848ec4de70a9
+    name: Kitchen light back 3
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  - id: 5740a63c-37ce-43de-9d19-132eb04313b7
+    name: Kitchen light front 1
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  - id: d7062125-4dbe-42f3-9549-7b963e92682c
+    name: Kitchen light front 2
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  - id: de72b0c7-8699-42a8-96c2-325efa7d0646
+    name: Kitchen light front 3
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  scenes:
+  - id: 320865ca-f474-4add-bb3b-7bbcf3670833
+    name: Relax
+    actions:
+    - target: e328723f-d8c9-43a1-b4e8-313ca5691427
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: daeabedf-8506-4c22-b348-848ec4de70a9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 5740a63c-37ce-43de-9d19-132eb04313b7
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: d7062125-4dbe-42f3-9549-7b963e92682c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: de72b0c7-8699-42a8-96c2-325efa7d0646
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+  - id: 3c574c56-b416-40e9-adee-fa809af7ff61
+    name: Bright
+    actions:
+    - target: e328723f-d8c9-43a1-b4e8-313ca5691427
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: daeabedf-8506-4c22-b348-848ec4de70a9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: 5740a63c-37ce-43de-9d19-132eb04313b7
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: d7062125-4dbe-42f3-9549-7b963e92682c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: de72b0c7-8699-42a8-96c2-325efa7d0646
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+  - id: 50daef03-e998-41e2-b70a-b91125377c08
+    name: Super nightlight
+    actions:
+    - target: e328723f-d8c9-43a1-b4e8-313ca5691427
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.6217999
+            y: 0.3606
+    - target: de72b0c7-8699-42a8-96c2-325efa7d0646
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.6217999
+            y: 0.3606
+    - target: daeabedf-8506-4c22-b348-848ec4de70a9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.6217999
+            y: 0.3606
+    - target: d7062125-4dbe-42f3-9549-7b963e92682c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.6217999
+            y: 0.3606
+    - target: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.6217999
+            y: 0.3606
+    - target: 5740a63c-37ce-43de-9d19-132eb04313b7
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.6217999
+            y: 0.3606
+  - id: 85a2deea-58f0-4b1a-8884-3f47bf0c2a1d
+    name: Dimmed
+    actions:
+    - target: e328723f-d8c9-43a1-b4e8-313ca5691427
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: de72b0c7-8699-42a8-96c2-325efa7d0646
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: daeabedf-8506-4c22-b348-848ec4de70a9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: d7062125-4dbe-42f3-9549-7b963e92682c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 5740a63c-37ce-43de-9d19-132eb04313b7
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+  - id: a77f79d3-ff8a-420b-a4a9-da1f809d59e9
+    name: Read
+    actions:
+    - target: e328723f-d8c9-43a1-b4e8-313ca5691427
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: daeabedf-8506-4c22-b348-848ec4de70a9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 5740a63c-37ce-43de-9d19-132eb04313b7
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: d7062125-4dbe-42f3-9549-7b963e92682c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: de72b0c7-8699-42a8-96c2-325efa7d0646
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+  - id: bc675dc6-25b8-438b-a3b6-bc0079175c25
+    name: Nightlight
+    actions:
+    - target: e328723f-d8c9-43a1-b4e8-313ca5691427
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: daeabedf-8506-4c22-b348-848ec4de70a9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 5740a63c-37ce-43de-9d19-132eb04313b7
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: d7062125-4dbe-42f3-9549-7b963e92682c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: de72b0c7-8699-42a8-96c2-325efa7d0646
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: eb7aab4e-030d-4109-81d4-9eed14b717a9
+    name: Rest
+    actions:
+    - target: e328723f-d8c9-43a1-b4e8-313ca5691427
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: de72b0c7-8699-42a8-96c2-325efa7d0646
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: daeabedf-8506-4c22-b348-848ec4de70a9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: d7062125-4dbe-42f3-9549-7b963e92682c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 5740a63c-37ce-43de-9d19-132eb04313b7
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+- id: e8ce28ca-4a41-472e-a613-fc9cc74144b9
+  name: Office Lights
+  archetype: kitchen
+  lights:
+  - id: f213a18c-755a-42eb-8fcb-44945b191c5a
+    name: Office light
+    'on': false
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  - id: 2e9ec450-900a-4a55-82f3-438208d4e7be
+    name: Office lamp
+    'on': false
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  scenes:
+  - id: 35f9eaf8-417e-4427-8488-0f0acdd74b23
+    name: Read
+    actions:
+    - target: f213a18c-755a-42eb-8fcb-44945b191c5a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 2e9ec450-900a-4a55-82f3-438208d4e7be
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+  - id: 390a2494-702d-4385-abe0-38536b152986
+    name: Nightlight
+    actions:
+    - target: f213a18c-755a-42eb-8fcb-44945b191c5a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 2e9ec450-900a-4a55-82f3-438208d4e7be
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 0.0
+        color_temperature:
+          mirek: 370
+  - id: 56ef3de6-6fc3-422b-9c78-ea72d302ebfb
+    name: Energise
+    actions:
+    - target: f213a18c-755a-42eb-8fcb-44945b191c5a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 156
+    - target: 2e9ec450-900a-4a55-82f3-438208d4e7be
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 156
+  - id: 59895fe2-96e6-444d-a70d-89b0916eaf4a
+    name: Bright
+    actions:
+    - target: f213a18c-755a-42eb-8fcb-44945b191c5a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: 2e9ec450-900a-4a55-82f3-438208d4e7be
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+  - id: 796818d8-30f8-4231-8640-3108dc09b81e
+    name: Dimmed
+    actions:
+    - target: f213a18c-755a-42eb-8fcb-44945b191c5a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 2e9ec450-900a-4a55-82f3-438208d4e7be
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+  - id: add7ff28-fa80-4cda-af6c-5522ee14a323
+    name: Relax
+    actions:
+    - target: f213a18c-755a-42eb-8fcb-44945b191c5a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 2e9ec450-900a-4a55-82f3-438208d4e7be
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+  - id: e320fd67-6567-435e-80c1-4f0c360288e4
+    name: Concentrate
+    actions:
+    - target: f213a18c-755a-42eb-8fcb-44945b191c5a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 233
+    - target: 2e9ec450-900a-4a55-82f3-438208d4e7be
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 233
+  - id: ebb2c097-c52e-4b13-976a-660e28258435
+    name: Rest
+    actions:
+    - target: f213a18c-755a-42eb-8fcb-44945b191c5a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 2e9ec450-900a-4a55-82f3-438208d4e7be
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color_temperature:
+          mirek: 370
+- id: fb3a3ce0-bafa-4839-818f-4e196490b55d
+  name: Living Room Lights
+  archetype: living_room
+  lights:
+  - id: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+    name: Living room lamp
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.4431
+      - 0.4061
+  - id: 91246fd9-b067-40aa-a42b-822f520dc55a
+    name: Living room ceiling light
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+    name: Living room light back 1
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+    name: Living room light front 1
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+    name: Living room light back 2
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: c82affb6-b23b-48c7-8828-074ab419b8b8
+    name: Living room light front 2
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+    name: Living room light front 3
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 8019a8f0-f68c-4b33-804c-75b473e8879c
+    name: Living room light back 4
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+    name: Living room light back 3
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+    name: Living room light front 4
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  scenes:
+  - id: 6f7582ce-c154-4bc5-b39d-821f833beffe
+    name: Rest
+    actions:
+    - target: 91246fd9-b067-40aa-a42b-822f520dc55a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: c82affb6-b23b-48c7-8828-074ab419b8b8
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 8019a8f0-f68c-4b33-804c-75b473e8879c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: 88ea8005-f08b-4185-a947-5628832acfc5
+    name: Nightlight
+    actions:
+    - target: 91246fd9-b067-40aa-a42b-822f520dc55a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: c82affb6-b23b-48c7-8828-074ab419b8b8
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 8019a8f0-f68c-4b33-804c-75b473e8879c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 0.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: a8fe4954-11c0-4479-a528-a8d334e1464e
+    name: Dimmed
+    actions:
+    - target: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 91246fd9-b067-40aa-a42b-822f520dc55a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: c82affb6-b23b-48c7-8828-074ab419b8b8
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 8019a8f0-f68c-4b33-804c-75b473e8879c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+  - id: b159e814-1541-4c5a-8bb3-77a576477bd9
+    name: Relax
+    actions:
+    - target: 91246fd9-b067-40aa-a42b-822f520dc55a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: c82affb6-b23b-48c7-8828-074ab419b8b8
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 8019a8f0-f68c-4b33-804c-75b473e8879c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+  - id: c709591c-07ae-45ca-be17-e44c6e35fde4
+    name: Read
+    actions:
+    - target: 91246fd9-b067-40aa-a42b-822f520dc55a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: c82affb6-b23b-48c7-8828-074ab419b8b8
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 8019a8f0-f68c-4b33-804c-75b473e8879c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+zones:
+- id: 20f0c4d6-48a1-4b74-89fd-faa6292f9598
+  name: Kitchen Spotlights
+  archetype: kitchen
+  lights:
+  - id: e328723f-d8c9-43a1-b4e8-313ca5691427
+    name: Kitchen light back 1
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  - id: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+    name: Kitchen light back 2
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  - id: daeabedf-8506-4c22-b348-848ec4de70a9
+    name: Kitchen light back 3
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  - id: 5740a63c-37ce-43de-9d19-132eb04313b7
+    name: Kitchen light front 1
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  - id: d7062125-4dbe-42f3-9549-7b963e92682c
+    name: Kitchen light front 2
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  - id: de72b0c7-8699-42a8-96c2-325efa7d0646
+    name: Kitchen light front 3
+    'on': true
+    brightness: 100.0
+    color:
+      xy:
+      - 0.459
+      - 0.4103
+  scenes:
+  - id: 011fc031-5437-4aa6-aba4-675746ef4a76
+    name: Relax
+    actions:
+    - target: e328723f-d8c9-43a1-b4e8-313ca5691427
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: de72b0c7-8699-42a8-96c2-325efa7d0646
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: daeabedf-8506-4c22-b348-848ec4de70a9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: d7062125-4dbe-42f3-9549-7b963e92682c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 5740a63c-37ce-43de-9d19-132eb04313b7
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+  - id: 4650855e-2733-4d95-90ba-e4dc597b7744
+    name: Nightlight
+    actions:
+    - target: e328723f-d8c9-43a1-b4e8-313ca5691427
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: de72b0c7-8699-42a8-96c2-325efa7d0646
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: daeabedf-8506-4c22-b348-848ec4de70a9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: d7062125-4dbe-42f3-9549-7b963e92682c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 5740a63c-37ce-43de-9d19-132eb04313b7
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: 5d21026c-ff69-4f4f-9ccf-f34ee6407ab9
+    name: Bright
+    actions:
+    - target: e328723f-d8c9-43a1-b4e8-313ca5691427
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: de72b0c7-8699-42a8-96c2-325efa7d0646
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: daeabedf-8506-4c22-b348-848ec4de70a9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: d7062125-4dbe-42f3-9549-7b963e92682c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: 5740a63c-37ce-43de-9d19-132eb04313b7
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+  - id: a744deca-3656-4d1f-81cd-68a46509499f
+    name: Rest
+    actions:
+    - target: e328723f-d8c9-43a1-b4e8-313ca5691427
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: de72b0c7-8699-42a8-96c2-325efa7d0646
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: daeabedf-8506-4c22-b348-848ec4de70a9
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: d7062125-4dbe-42f3-9549-7b963e92682c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: b0d3f58f-0953-4574-91ae-9ef0a5990fcd
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 5740a63c-37ce-43de-9d19-132eb04313b7
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+- id: 4d27b80a-e386-48af-a3f2-a37d7ab65fc5
+  name: Bedroom Main Light
+  archetype: upstairs
+  lights:
+  - id: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+    name: Bedroom light
+    'on': false
+    brightness: 9.9
+    color:
+      xy:
+      - 0.5612
+      - 0.4042
+  scenes:
+  - id: 21f9cfbb-5873-4f74-a8f8-5c4d43decef3
+    name: Relax
+    actions:
+    - target: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+  - id: 552e3830-821e-4bd0-a945-f9235d9f2312
+    name: Bright
+    actions:
+    - target: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+  - id: 59a48dd7-1742-4e32-b748-3a12a31c649e
+    name: Nightlight
+    actions:
+    - target: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: 8b7651ed-5e10-4a76-a2b2-5d86014d6339
+    name: Concentrate
+    actions:
+    - target: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 233
+  - id: a3350b21-bccb-4825-b17b-53b151cd392a
+    name: Energise
+    actions:
+    - target: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 156
+  - id: bfa92d96-8d46-428e-a287-e7cbe7da0c7d
+    name: Rest
+    actions:
+    - target: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: c44bde84-a89b-4be9-a67a-f22020edfbe7
+    name: Read
+    actions:
+    - target: d2e92b6b-d284-4975-96b5-4d25a7f31e9a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+- id: 9a7f1f4f-ab8c-4f4b-82c0-02c4c71d7d80
+  name: Bedroom Lamps
+  archetype: bedroom
+  lights:
+  - id: fbea6af9-f01c-4968-afd8-13ec1653badf
+    name: Jamie's bed side lamp
+    'on': false
+    brightness: 35.2
+    color:
+      xy:
+      - 0.5612
+      - 0.4042
+  - id: 4755c9c3-79fd-4226-a050-cf29c55702c4
+    name: Mels bed side lamp
+    'on': false
+    brightness: 35.2
+    color:
+      xy:
+      - 0.5612
+      - 0.4042
+  scenes: []
+- id: c926a371-43cd-4753-b99a-b99fc601e1cc
+  name: Living Room Ceiling and Lamp
+  archetype: kitchen
+  lights:
+  - id: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+    name: Living room lamp
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.4431
+      - 0.4061
+  - id: 91246fd9-b067-40aa-a42b-822f520dc55a
+    name: Living room ceiling light
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  scenes:
+  - id: 301c1542-64e1-48ea-b099-d50344329d77
+    name: Bright
+    actions:
+    - target: 91246fd9-b067-40aa-a42b-822f520dc55a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+  - id: 419a175c-68fc-4a2f-bcdb-7b2b9f48fd63
+    name: Dimmed
+    actions:
+    - target: 91246fd9-b067-40aa-a42b-822f520dc55a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+  - id: 5661ba17-0a45-46b1-9483-920e800d6f09
+    name: Relax
+    actions:
+    - target: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 91246fd9-b067-40aa-a42b-822f520dc55a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+  - id: 76ff949e-53de-441e-b5ef-d31018eac6cb
+    name: Nightlight
+    actions:
+    - target: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 91246fd9-b067-40aa-a42b-822f520dc55a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: b43a8510-b172-4e56-9535-e0fa014e9ef5
+    name: Read
+    actions:
+    - target: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 91246fd9-b067-40aa-a42b-822f520dc55a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+  - id: d32ca5f5-8244-4b16-ba46-d54c37a09ad3
+    name: Rest
+    actions:
+    - target: 91246fd9-b067-40aa-a42b-822f520dc55a
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 1b9871fc-bdcd-41ba-a2df-df7c00629c57
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+- id: cffe5dc3-2b81-4bd6-b05e-9f8914e2cb1c
+  name: Living Room Spotlights
+  archetype: bedroom
+  lights:
+  - id: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+    name: Living room light back 1
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+    name: Living room light front 1
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+    name: Living room light back 2
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: c82affb6-b23b-48c7-8828-074ab419b8b8
+    name: Living room light front 2
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+    name: Living room light front 3
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 8019a8f0-f68c-4b33-804c-75b473e8879c
+    name: Living room light back 4
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+    name: Living room light back 3
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  - id: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+    name: Living room light front 4
+    'on': true
+    brightness: 73.1
+    color:
+      xy:
+      - 0.445
+      - 0.4067
+  scenes:
+  - id: 31cb72e5-9b22-4e47-b12a-2bca05fec876
+    name: Relax
+    actions:
+    - target: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: c82affb6-b23b-48c7-8828-074ab419b8b8
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 8019a8f0-f68c-4b33-804c-75b473e8879c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+    - target: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 56.25
+        color_temperature:
+          mirek: 447
+  - id: 3a8809d1-b81c-4817-908b-638c3111c7f8
+    name: Nightlight
+    actions:
+    - target: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: c82affb6-b23b-48c7-8828-074ab419b8b8
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 8019a8f0-f68c-4b33-804c-75b473e8879c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 10.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: 444b7703-ce5e-406f-a0e8-e20eff2a9a87
+    name: Rest
+    actions:
+    - target: c82affb6-b23b-48c7-8828-074ab419b8b8
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 8019a8f0-f68c-4b33-804c-75b473e8879c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+    - target: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 35.0
+        color:
+          xy:
+            x: 0.5609999
+            y: 0.4042
+  - id: 4eb9217e-1dab-4e84-a3bb-796ff5de2e68
+    name: Read
+    actions:
+    - target: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: c82affb6-b23b-48c7-8828-074ab419b8b8
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 8019a8f0-f68c-4b33-804c-75b473e8879c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+    - target: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 346
+  - id: 91787921-5616-4c78-abaf-00991993a997
+    name: Bright
+    actions:
+    - target: c82affb6-b23b-48c7-8828-074ab419b8b8
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: 8019a8f0-f68c-4b33-804c-75b473e8879c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+    - target: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 100.0
+        color_temperature:
+          mirek: 370
+  - id: d5299b05-c197-4915-9cb8-89f27a674eb1
+    name: Dimmed
+    actions:
+    - target: c82affb6-b23b-48c7-8828-074ab419b8b8
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 9ffbf9f8-149a-4a7a-b299-caabde09db2c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 8886cdb4-2ada-4ba6-8690-fb9ff0fc8a25
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 873c6fc2-7412-4ade-96c4-d2463bb0e764
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 8019a8f0-f68c-4b33-804c-75b473e8879c
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 60378ef5-ed3a-494e-ac1b-4ee6d9e58e62
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 3b5fec5e-2c52-420e-a5c6-6b481ce1b96d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+    - target: 07c1b9b8-6579-44be-94d1-7d094c282b3d
+      action:
+        'on':
+          'on': true
+        dimming:
+          brightness: 30.0
+        color_temperature:
+          mirek: 370
+devices:
+- id: 08681750-86f2-4cd8-b7e7-16ea0918d6ff
+  name: Landing light
+  model_id: LCA001
+  archetype: pendant_round
+  software_version: 1.122.8
+- id: 089a3faa-367b-42d3-8755-8ea5a9b55491
+  name: Living room lamp
+  model_id: LCA001
+  archetype: floor_shade
+  software_version: 1.122.8
+- id: 154a9da1-cdb0-4a16-b7a0-e5fba5f95201
+  name: Living room ceiling light
+  model_id: LCA006
+  archetype: pendant_round
+  software_version: 1.145.1
+- id: 1e97af4f-6666-40fc-92fe-b2a25baed168
+  name: Kitchen light back 3
+  model_id: LCG002
+  archetype: single_spot
+  software_version: 1.145.1
+- id: 297843ab-80a4-4c4d-9841-39ba7fedf7e7
+  name: Living room light front 3
+  model_id: LCG002
+  archetype: recessed_ceiling
+  software_version: 1.145.1
+- id: 31b6f109-9d44-42f0-ba9c-044f39057a93
+  name: Office lamp
+  model_id: '929003128401'
+  archetype: table_shade
+  software_version: 1.122.8
+- id: 32d420cf-b839-43c0-b05f-d2d0a07afc91
+  name: Living room light front 1
+  model_id: LCG002
+  archetype: recessed_ceiling
+  software_version: 1.145.1
+- id: 33067be4-d8a1-4697-bb11-a4009917cca5
+  name: Hallway Light Switch
+  model_id: RWL022
+  archetype: unknown_archetype
+  software_version: 2.85.1
+- id: 40224be3-53b9-433a-9a25-bafbe9cbdb22
+  name: Living room light back 4
+  model_id: LCG002
+  archetype: recessed_ceiling
+  software_version: 1.145.1
+- id: 4944b3a6-e587-4394-b2c7-6acb0ac0a43f
+  name: Mels bed side lamp
+  model_id: LCE002
+  archetype: flexible_lamp
+  software_version: 1.145.1
+- id: 50f87eb7-41db-4e63-afb4-dcb4e1789421
+  name: Living Room Smart Switch
+  model_id: RDM002
+  archetype: unknown_archetype
+  software_version: 2.85.1
+- id: 518f8cbc-f2a6-4d1b-9ec0-cd688f91da4e
+  name: Living room light back 1
+  model_id: LCG002
+  archetype: recessed_ceiling
+  software_version: 1.145.1
+- id: 55ed16a1-afc3-4a45-aed1-2b8495e4e78e
+  name: Kitchen light back 2
+  model_id: LCG002
+  archetype: single_spot
+  software_version: 1.145.1
+- id: 5a2c73eb-2855-4f44-8c5a-c9ed66d06fa9
+  name: Living room light front 4
+  model_id: LCG002
+  archetype: recessed_ceiling
+  software_version: 1.145.1
+- id: 5c25d300-d998-455f-b606-dcdb9cfa13ca
+  name: Landing Light Switch
+  model_id: RWL022
+  archetype: unknown_archetype
+  software_version: 2.85.1
+- id: 7006c5f4-f402-4683-b6b8-82b292029d24
+  name: Kitchen Light Switch
+  model_id: RDM004
+  archetype: unknown_archetype
+  software_version: 2.85.1
+- id: 779a893a-90cf-4606-b2bf-f88ee0326187
+  name: Living room light back 2
+  model_id: LCG002
+  archetype: recessed_ceiling
+  software_version: 1.145.1
+- id: 7e118924-20b9-4ca8-bae1-ad8102e20976
+  name: Living room light front 2
+  model_id: LCG002
+  archetype: recessed_ceiling
+  software_version: 1.145.1
+- id: 8710db1e-ceb8-49ba-a4fb-921c07b9ac52
+  name: Jamie's bed side lamp
+  model_id: LCE002
+  archetype: flexible_lamp
+  software_version: 1.145.1
+- id: 9b54f87d-4aea-4699-96b8-8a07063e9bf0
+  name: Office Light Switch
+  model_id: RWL021
+  archetype: unknown_archetype
+  software_version: 67.116.1
+- id: a345fa3a-90e2-4bf2-a452-18275e474b80
+  name: Bedroom light
+  model_id: LCA001
+  archetype: pendant_round
+  software_version: 1.122.8
+- id: a90223cf-f807-4458-bdcc-009696b36142
+  name: Living Room Light Switch
+  model_id: RDM004
+  archetype: unknown_archetype
+  software_version: 2.85.1
+- id: b939ec50-28c9-48e9-a99a-cf8d19a9f5b7
+  name: Living room light back 3
+  model_id: LCG002
+  archetype: recessed_ceiling
+  software_version: 1.145.1
+- id: ba4b13dd-5281-4846-a9da-0009324a3da9
+  name: Bedroom Light Switch
+  model_id: RWL022
+  archetype: unknown_archetype
+  software_version: 2.85.1
+- id: bd36d5b0-b2d6-4c8b-a779-529f520b6cbd
+  name: Kitchen light front 3
+  model_id: LCG002
+  archetype: single_spot
+  software_version: 1.145.1
+- id: cbb3e55f-c461-4501-a8fe-857c5fb8d1da
+  name: Kitchen light back 1
+  model_id: LCG002
+  archetype: single_spot
+  software_version: 1.145.1
+- id: d5e522bc-b60e-451b-90cd-cee78fe97849
+  name: Office light
+  model_id: LCA001
+  archetype: pendant_round
+  software_version: 1.122.8
+- id: d6d986ee-f7c2-4dca-8c64-3f8dd75f2a4d
+  name: Kitchen light front 2
+  model_id: LCG002
+  archetype: single_spot
+  software_version: 1.145.1
+- id: e9a246ae-7b61-4036-b143-7f82f32f63f8
+  name: Hallway light
+  model_id: LCA006
+  archetype: pendant_round
+  software_version: 1.145.1
+- id: f0d0b00c-9752-4b5c-899d-fdc20ac0c60e
+  name: Visitor bedroom light
+  model_id: LCA001
+  archetype: pendant_round
+  software_version: 1.122.8
+- id: f26dbd73-344f-4f0a-8c0f-ac58263a9d24
+  name: Visitor Bedroom Switch
+  model_id: RWL022
+  archetype: unknown_archetype
+  software_version: 2.85.1
+- id: f7b25dbc-d6cd-4b49-b4c3-8fdb98710014
+  name: Hue Bridge
+  model_id: BSB002
+  archetype: bridge_v2
+  software_version: 1.76.1976124000
+- id: f8eea8aa-e51d-454b-9733-d923a5235955
+  name: Kitchen light front 1
+  model_id: LCG002
+  archetype: single_spot
+  software_version: 1.145.1
