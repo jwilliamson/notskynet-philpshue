@@ -50,6 +50,22 @@ rooms:
 
 ---
 
+## Supported Device Types
+
+The system supports multiple Philips Hue switch types with different button counts and capabilities:
+
+| Device Type | Model IDs | Buttons | Supported Actions | Notes |
+|-------------|-----------|---------|-------------------|-------|
+| `dimmer_v1` (or `v1`) | RWL021 | 4 | **Button 1**: timezone, scene_cycle, room_toggle<br>**Button 2**: dim_up<br>**Button 3**: dim_down<br>**Button 4**: room_toggle, scene_cycle | Classic dimmer switch |
+| `dimmer_v2` (or `v2`) | RWL022 | 4 | **Button 1**: timezone, scene_cycle, room_toggle<br>**Button 2**: dim_up<br>**Button 3**: dim_down<br>**Button 4**: timezone, scene_cycle, room_toggle | Newer dimmer with Hue button |
+| `wall_switch` | RDM001, RDM002, RDM004 | 2 | **Button 1**: timezone, scene_cycle, room_toggle<br>**Button 2**: timezone, scene_cycle, room_toggle | Wall-mounted switch module |
+
+**Hold Actions**: All device types support configurable long press behavior on buttons that support short_release actions (not dim_up/dim_down).
+
+**Backward Compatibility**: Existing configs using `model_type: "v1"` or `"v2"` will continue to work. The new naming (`dimmer_v1`, `dimmer_v2`, `wall_switch`) is optional but recommended for clarity.
+
+---
+
 ## Keyword Reference
 
 ### Top-Level Keywords
@@ -143,10 +159,13 @@ rooms:
 
 #### `model_type:` (required)
 - **Type**: String
-- **Description**: The dimmer switch hardware version
-- **Valid values**: `"v1"` (RWL021) or `"v2"` (RWL022)
-- **How to find**: v2 switches have a Hue logo on the bottom button, v1 switches do not
-- **Note**: Button layout differs between v1 and v2 (see Button Behavior section below)
+- **Description**: The switch device type
+- **Valid values**:
+  - `"dimmer_v1"` or `"v1"` - Hue Dimmer Switch v1 (RWL021)
+  - `"dimmer_v2"` or `"v2"` - Hue Dimmer Switch v2 (RWL022)
+  - `"wall_switch"` - Hue Wall Switch Module (RDM001/RDM002/RDM004)
+- **How to find**: Check the Hue app or `household_architecture.yaml` under devices for the model_id
+- **Note**: Button layout and supported actions differ by device type (see Supported Device Types table below)
 
 #### `buttons:` (required)
 - **Type**: List of button configurations
@@ -196,6 +215,20 @@ rooms:
 - **Must contain**: At least one scene name
 - **Order**: Scenes cycle in the order specified (Scene 1 → Scene 2 → Scene 3 → Scene 1...)
 - **Timeout**: 3-second timeout between presses; after timeout, cycle resets to first scene
+
+#### `hold_action:` (optional)
+
+- **Type**: String
+- **Description**: Action to perform when button is held for ~1 second
+- **Valid values**:
+  - `"home_off"` - Turn off ALL lights in the house (default for button 1)
+  - `"room_off"` - Turn off only the target room
+  - `"scene_prev"` - Go to previous scene in cycle (if button uses scene_cycle)
+  - `"do_nothing"` - Disable hold functionality (default for buttons 2-4)
+- **Default behavior**:
+  - Button 1: `home_off` (backward compatible with existing configs)
+  - All other buttons: `do_nothing`
+- **Example**: `hold_action: "room_off"`
 
 ---
 
@@ -311,11 +344,52 @@ rooms:
             action: "scene_cycle"
             target: "Bedroom Lights"
             scenes: ["Morning", "Evening", "Nightlight"]
+            hold_action: "scene_prev"  # Hold button 4 to go backwards
 
-  # Kitchen with no switch (scenes only)
+  # Kitchen with wall switch (RDM004)
   - room_name: "Kitchen Lights"
     scenes:
+      - name: "Bright"
+        brightness: 100.0
+        color_temperature:
+          mirek: 370
+      
       - name: "Cooking"
+        brightness: 80.0
+        color_temperature:
+          mirek: 346
+      
+      - name: "Dining"
+        brightness: 40.0
+        color_temperature:
+          mirek: 447
+    
+    switches:
+      - device_name: "Kitchen Light Switch"
+        model_type: "wall_switch"
+        buttons:
+          - button_number: 1
+            action: "timezone"
+            target: "Kitchen Lights"
+            time_slots:
+              - start_time:
+                  hour: 6
+                scene: "Bright"
+              - start_time:
+                  hour: 18
+                scene: "Dining"
+            hold_action: "room_off"  # Hold button 1 to turn off kitchen only
+          
+          - button_number: 2
+            action: "scene_cycle"
+            target: "Kitchen Lights"
+            scenes: ["Bright", "Cooking", "Dining"]
+            hold_action: "do_nothing"
+
+  # Living Room with no switch (scenes only)
+  - room_name: "Living Room Lights"
+    scenes:
+      - name: "Bright"
         brightness: 100.0
         color_temperature:
           mirek: 300

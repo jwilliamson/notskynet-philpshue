@@ -66,3 +66,73 @@ rooms:
           - button_number: 4
             action: "room_toggle"
             target: "Office Lights"
+
+  - room_name: "Hallway Lights"
+    scenes:
+      # Rest scene - 35% brightness, warm orange
+      - name: "Rest"
+        brightness: 35.0
+        color:
+          x: 0.5609999
+          y: 0.4042
+
+      # Nightlight scene - 10% brightness, warm orange
+      - name: "Nightlight"
+        brightness: 10.0
+        color:
+          x: 0.5609999
+          y: 0.4042
+
+      # Dimmed scene - 30% brightness, warm white
+      - name: "Dimmed"
+        brightness: 30.0
+        color_temperature:
+          mirek: 370
+
+      # Relax scene - 56% brightness, very warm white
+      - name: "Relax"
+        brightness: 56.25
+        color_temperature:
+          mirek: 447
+
+      # Read scene - 100% brightness, slightly cool white
+      - name: "Read"
+        brightness: 100.0
+        color_temperature:
+          mirek: 346
+
+    # Switch configuration for dimmer v2 (RWL022)
+    switches:
+      - device_name: "Hallway Light Switch"
+        model_type: "dimmer_v2"
+        buttons:
+          # Button 1 (ON) - Timezone (turns on with time-based scene)
+          - button_number: 1
+            action: "timezone"
+            target: "Hallway Lights"
+            time_slots:
+              - start_time:
+                  hour: 8
+                scene: "Relax"
+              - start_time:
+                  hour: 13
+                scene: "Read"
+              - start_time:
+                  hour: 18
+                scene: "Rest"
+              - start_time:
+                  hour: 20
+                scene: "Nightlight"
+
+          # Button 2 (Dim Up)
+          - button_number: 2
+            action: "dim_up"
+
+          # Button 3 (Dim Down)
+          - button_number: 3
+            action: "dim_down"
+
+          # Button 4 (Hue) - Room toggle
+          - button_number: 4
+            action: "room_toggle"
+            target: "Hallway Lights"

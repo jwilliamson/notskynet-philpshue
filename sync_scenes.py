@@ -44,7 +44,7 @@ import requests
 import urllib3
 import yaml
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field, field_validator, ValidationError
+from pydantic import BaseModel, Field, field_validator, model_validator, ValidationError
 
 
 # ============================================================================
@@ -113,6 +113,7 @@ class ButtonConfig(BaseModel):
     target: Optional[str] = Field(None, description="Target room or zone name (required for timezone, scene_cycle, room_toggle)")
     time_slots: Optional[List[TimeSlot]] = Field(None, min_length=1, description="Time slots (required for timezone action)")
     scenes: Optional[List[str]] = Field(None, min_length=1, description="Scene names (required for scene_cycle action)")
+    hold_action: Optional[str] = Field(None, description="Long press action: home_off, room_off, scene_prev, do_nothing")
 
     @field_validator('action')
     @classmethod
@@ -172,20 +173,32 @@ class ButtonConfig(BaseModel):
 
         return v
 
+    @field_validator('hold_action')
+    @classmethod
+    def validate_hold_action(cls, v):
+        """Validate hold_action is one of supported types."""
+        if v and v not in {'home_off', 'room_off', 'scene_prev', 'do_nothing'}:
+            raise ValueError(f"hold_action must be one of: home_off, room_off, scene_prev, do_nothing, got '{v}'")
+        return v
+
 
 class SwitchConfig(BaseModel):
     """Complete switch configuration with per-button settings."""
     device_name: str = Field(..., min_length=1, description="Device name (must match Hue Bridge)")
-    model_type: str = Field(..., description="Switch model type: v1 or v2")
-    buttons: List[ButtonConfig] = Field(..., min_length=1, max_length=4, description="Button configurations")
+    model_type: str = Field(..., description="Device type: dimmer_v1, dimmer_v2, wall_switch (or v1/v2 for backward compat)")
+    model_id: Optional[str] = Field(None, description="Optional explicit model ID for validation (e.g., RWL021, RDM004)")
+    buttons: List[ButtonConfig] = Field(..., min_length=1, description="Button configurations")
 
     @field_validator('model_type')
     @classmethod
     def validate_model_type(cls, v):
-        """Validate model type."""
-        if v not in {'v1', 'v2'}:
-            raise ValueError(f"model_type must be 'v1' or 'v2', got '{v}'")
-        return v
+        """Validate and normalize model type."""
+        from device_capabilities import normalize_model_type
+        try:
+            normalize_model_type(v)  # Will raise ValueError if invalid
+            return v
+        except ValueError as e:
+            raise ValueError(f"Invalid model_type: {e}")
 
     @field_validator('buttons')
     @classmethod
@@ -195,6 +208,40 @@ class SwitchConfig(BaseModel):
         if len(button_numbers) != len(set(button_numbers)):
             raise ValueError("button_number values must be unique")
         return v
+
+    @model_validator(mode='after')
+    def validate_device_capabilities(self) -> 'SwitchConfig':
+        """Validate buttons against device capabilities."""
+        from device_capabilities import get_device_capability, normalize_model_type, validate_button_action
+
+        device_type = normalize_model_type(self.model_type)
+        capability = get_device_capability(self.model_type)
+
+        # Validate button count
+        if len(self.buttons) > capability.button_count:
+            raise ValueError(
+                f"{capability.description} has {capability.button_count} buttons, "
+                f"but config defines {len(self.buttons)}"
+            )
+
+        # Validate button numbers and actions
+        for button in self.buttons:
+            if button.button_number > capability.button_count:
+                raise ValueError(
+                    f"Button {button.button_number} invalid for {capability.description} "
+                    f"(has {capability.button_count} buttons)"
+                )
+
+            # Validate action is supported for this button
+            if not validate_button_action(device_type, button.button_number, button.action):
+                from device_capabilities import get_supported_actions_for_button
+                supported = get_supported_actions_for_button(device_type, button.button_number)
+                raise ValueError(
+                    f"Action '{button.action}' not supported for {capability.description} "
+                    f"button {button.button_number}. Supported: {supported}"
+                )
+
+        return self
 
 
 class RoomConfig(BaseModel):
@@ -834,26 +881,30 @@ class HueAPIClient:
 
     def _build_long_press_config(
         self,
-        button_number: int
+        button_number: int,
+        hold_action: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Build on_long_press configuration for button.
 
-        Button 1 (ON button) turns off all house lights when held using home_off action.
-        All other buttons do nothing on hold.
-
         Args:
-            button_number: Button number (1-4)
+            button_number: Button number (1-N)
+            hold_action: Optional override (home_off, room_off, scene_prev, do_nothing)
+                        If None, defaults to: button 1 = home_off, others = do_nothing
 
         Returns:
             Dictionary with on_long_press configuration
         """
-        # Only button 1 (ON button) has hold-to-turn-off-all functionality
-        if button_number == 1:
-            return {"action": "home_off"}
+        # Use explicit hold_action if provided
+        if hold_action:
+            action = hold_action
+        # Default behavior: button 1 = home_off (backward compatible)
+        elif button_number == 1:
+            action = "home_off"
+        else:
+            action = "do_nothing"
 
-        # All other buttons: do nothing on hold
-        return {"action": "do_nothing"}
+        return {"action": action}
 
     def create_behavior_instance_v2(
         self,
@@ -885,14 +936,22 @@ class HueAPIClient:
         Raises:
             HueAPIError: If request fails or invalid button configuration
         """
+        from device_capabilities import get_device_capability, normalize_model_type
+
+        device_type = normalize_model_type(switch_config.model_type)
+        capability = get_device_capability(switch_config.model_type)
+
         # Get button resources from API
         api_buttons = self.get_buttons_for_device(device_id)
-        if len(api_buttons) != 4:
-            raise HueAPIError(f"Expected 4 buttons for dimmer switch, got {len(api_buttons)}")
+        if len(api_buttons) != capability.button_count:
+            raise HueAPIError(
+                f"{capability.description} expects {capability.button_count} buttons, "
+                f"but device has {len(api_buttons)}"
+            )
 
         # Sort by control_id for consistent mapping
         sorted_buttons = sorted(api_buttons, key=lambda b: b.get("metadata", {}).get("control_id", 0))
-        button_number_to_id = {i + 1: sorted_buttons[i]["id"] for i in range(4)}
+        button_number_to_id = {i + 1: sorted_buttons[i]["id"] for i in range(len(sorted_buttons))}
 
         # Build configuration dict for each button
         buttons_config = {}
@@ -921,7 +980,7 @@ class HueAPIClient:
                             "with_off": {"enabled": True}
                         }
                     },
-                    "on_long_press": self._build_long_press_config(button_cfg.button_number),
+                    "on_long_press": self._build_long_press_config(button_cfg.button_number, button_cfg.hold_action),
                     "where": [{"group": {"rid": target_id, "rtype": target_rtype}}]
                 }
 
@@ -941,7 +1000,7 @@ class HueAPIClient:
                             "with_off": {"enabled": False}
                         }
                     },
-                    "on_long_press": self._build_long_press_config(button_cfg.button_number),
+                    "on_long_press": self._build_long_press_config(button_cfg.button_number, button_cfg.hold_action),
                     "where": [{"group": {"rid": target_id, "rtype": target_rtype}}]
                 }
 
@@ -964,7 +1023,7 @@ class HueAPIClient:
                             "with_off": {"enabled": True}
                         }
                     },
-                    "on_long_press": self._build_long_press_config(button_cfg.button_number),
+                    "on_long_press": self._build_long_press_config(button_cfg.button_number, button_cfg.hold_action),
                     "where": [{"group": {"rid": target_id, "rtype": target_rtype}}]
                 }
 
@@ -1584,6 +1643,128 @@ def print_summary(
         logger.info("!" * 60)
 
 
+def validate_config_against_bridge(
+    client: HueAPIClient,
+    config: RoomsScenesConfig,
+    verbose: bool = True
+) -> bool:
+    """
+    Validate YAML configuration against actual bridge hardware.
+
+    Checks:
+    - Device names exist on bridge
+    - Model IDs match (if specified in config)
+    - Button counts match device capabilities
+    - Warns about unreachable/low battery devices
+
+    Args:
+        client: HueAPIClient instance
+        config: Parsed RoomsScenesConfig
+        verbose: Print detailed validation output
+
+    Returns:
+        True if validation passes, False if errors found
+    """
+    import logging
+    from device_capabilities import get_device_capability, normalize_model_type, detect_device_type_from_model_id
+
+    logger = logging.getLogger(__name__)
+    logger.info("\n" + "="*80)
+    logger.info("CONFIGURATION VALIDATION")
+    logger.info("="*80 + "\n")
+
+    # Query bridge for devices
+    devices_data = client.get_devices()
+    device_by_name = {d.get('metadata', {}).get('name'): d for d in devices_data}
+
+    validation_passed = True
+    warnings = []
+
+    for room in config.rooms:
+        if not room.switches:
+            continue
+
+        logger.info(f"Room: {room.room_name}")
+
+        for switch in room.switches:
+            logger.info(f"  Switch: {switch.device_name}")
+
+            # Check device exists
+            bridge_device = device_by_name.get(switch.device_name)
+            if not bridge_device:
+                logger.error(f"    ❌ Device '{switch.device_name}' not found on bridge")
+                validation_passed = False
+                continue
+
+            # Extract model_id from bridge
+            bridge_model_id = bridge_device.get('product_data', {}).get('model_id', 'Unknown')
+            logger.info(f"    Bridge model_id: {bridge_model_id}")
+
+            # Detect device type from bridge
+            detected_type = detect_device_type_from_model_id(bridge_model_id)
+            config_type = normalize_model_type(switch.model_type)
+
+            # Check model_type matches
+            if detected_type != config_type:
+                logger.error(
+                    f"    ❌ Config specifies '{switch.model_type}' but bridge reports '{bridge_model_id}' "
+                    f"(detected as {detected_type.value})"
+                )
+                validation_passed = False
+                continue
+
+            # Check explicit model_id if provided
+            if switch.model_id and switch.model_id != bridge_model_id:
+                logger.error(
+                    f"    ❌ Config specifies model_id '{switch.model_id}' but bridge reports '{bridge_model_id}'"
+                )
+                validation_passed = False
+                continue
+
+            # Check button count
+            capability = get_device_capability(switch.model_type)
+            buttons = client.get_buttons_for_device(bridge_device['id'])
+            if len(buttons) != capability.button_count:
+                logger.warning(
+                    f"    ⚠️  Device has {len(buttons)} buttons but {capability.description} "
+                    f"expects {capability.button_count}"
+                )
+                warnings.append(f"{switch.device_name}: unexpected button count")
+
+            # Check battery status (if available)
+            power_state = bridge_device.get('power_state', {})
+            battery_level = power_state.get('battery_level')
+            battery_state = power_state.get('battery_state')
+
+            if battery_level is not None:
+                logger.info(f"    Battery: {battery_level}% ({battery_state})")
+                if battery_level < 20:
+                    logger.warning(f"    ⚠️  Low battery: {battery_level}%")
+                    warnings.append(f"{switch.device_name}: low battery")
+
+            logger.info(f"    ✓ Validation passed")
+            logger.info(f"    Configured buttons: {len(switch.buttons)}/{capability.button_count}")
+            for button in switch.buttons:
+                hold_info = f" (hold: {button.hold_action})" if button.hold_action else ""
+                logger.info(f"      Button {button.button_number}: {button.action}{hold_info}")
+
+        logger.info("")
+
+    # Summary
+    logger.info("="*80)
+    if validation_passed:
+        logger.info("✓ VALIDATION PASSED")
+        if warnings:
+            logger.info(f"  {len(warnings)} warning(s):")
+            for warning in warnings:
+                logger.info(f"    ⚠️  {warning}")
+    else:
+        logger.error("❌ VALIDATION FAILED - Fix errors before running with --execute")
+    logger.info("="*80 + "\n")
+
+    return validation_passed
+
+
 def main() -> None:
     """Main entry point."""
     # Parse CLI arguments
@@ -1630,6 +1811,14 @@ def main() -> None:
         logger.warning("\n" + "!" * 60)
         logger.warning("EXECUTE MODE: Changes will be applied to Hue Bridge")
         logger.warning("!" * 60)
+
+    # Validate configuration against bridge hardware (only if switches configured)
+    has_switches = any(room.switches for room in rooms_to_sync)
+    if has_switches:
+        validation_passed = validate_config_against_bridge(client, config, verbose=args.verbose)
+        if not validation_passed:
+            logger.error("Configuration validation failed - aborting")
+            sys.exit(1)
 
     # Sync each room
     results = {
