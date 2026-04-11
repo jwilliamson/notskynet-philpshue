@@ -77,8 +77,7 @@ rooms:
             action: "dim_down"
 
           - button_number: 4
-            action: "room_toggle"
-            target: "Hallway Lights"
+            action: "scene_cycle"
 
   - room_name: "Landing Lights"
     scenes:
@@ -116,5 +115,4 @@ rooms:
             action: "dim_down"
 
           - button_number: 4
-            action: "room_toggle"
-            target: "Landing Lights"
+            action: "scene_cycle"

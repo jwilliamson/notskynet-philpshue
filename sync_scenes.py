@@ -146,8 +146,9 @@ class ButtonConfig(BaseModel):
         action = data.get('action')
 
         if action == 'scene_cycle':
-            if not v:
-                raise ValueError("scene_cycle action requires scenes list")
+            # Allow None - will inherit from room scenes
+            if v is not None and len(v) < 1:
+                raise ValueError("scene_cycle action requires at least one scene when explicitly provided")
         elif v is not None:
             raise ValueError(f"scenes only valid for scene_cycle action, not {action}")
 
@@ -160,10 +161,16 @@ class ButtonConfig(BaseModel):
         data = info.data
         action = data.get('action')
 
-        if action in {'timezone', 'scene_cycle', 'room_toggle'}:
+        # Actions that MUST have target
+        if action in {'timezone', 'room_toggle'}:
             if not v:
                 raise ValueError(f"{action} action requires target (room or zone name)")
-        elif v is not None and action in {'dim_up', 'dim_down'}:
+
+        # scene_cycle can have None - will inherit from room
+        # No validation needed for scene_cycle target
+
+        # Actions that must NOT have target
+        if v is not None and action in {'dim_up', 'dim_down'}:
             raise ValueError(f"{action} action does not use target parameter")
 
         return v
@@ -279,14 +286,15 @@ class RoomConfig(BaseModel):
 
         for switch in v:
             for button in switch.buttons:
-                # Check scene_cycle scenes
-                if button.action == 'scene_cycle' and button.scenes:
+                # Check scene_cycle scenes (only if explicitly provided)
+                if button.action == 'scene_cycle' and button.scenes is not None:
                     for scene_name in button.scenes:
                         if scene_name not in room_scenes:
                             raise ValueError(
                                 f"Scene '{scene_name}' in button {button.button_number} "
                                 f"not found in room scenes: {sorted(room_scenes)}"
                             )
+                # If scenes is None, will inherit all room scenes - no validation needed
 
                 # Check timezone scenes
                 if button.action == 'timezone' and button.time_slots:
@@ -929,6 +937,7 @@ class HueAPIClient:
         device_name: str,
         model_id: str,
         room_id: str,
+        room_name: str,
         switch_config: 'SwitchConfig',
         room_lookup: Dict[str, str],
         zone_lookup: Dict[str, str],
@@ -942,6 +951,7 @@ class HueAPIClient:
             device_name: Device name (for metadata)
             model_id: Device model ID (e.g., RWL021, RWL022, RDM004)
             room_id: Room UUID (fallback context for dim buttons)
+            room_name: Room name (for scene_cycle target inheritance)
             switch_config: SwitchConfig with button configurations
             room_lookup: Room name to ID mapping
             zone_lookup: Zone name to ID mapping
@@ -1003,9 +1013,15 @@ class HueAPIClient:
 
             elif button_cfg.action == 'scene_cycle':
                 # Build scene_cycle_extended configuration
-                target_id, target_rtype = self._resolve_target(button_cfg.target, room_lookup, zone_lookup)
+                # Inherit target from room if not specified
+                effective_target = button_cfg.target if button_cfg.target is not None else room_name
+                target_id, target_rtype = self._resolve_target(effective_target, room_lookup, zone_lookup)
+
+                # Inherit scenes from room if not specified
+                effective_scenes = button_cfg.scenes if button_cfg.scenes is not None else list(scene_name_to_id.keys())
+
                 scene_slots = []
-                for scene_name in button_cfg.scenes:
+                for scene_name in effective_scenes:
                     scene_id = scene_name_to_id[scene_name]
                     scene_slots.append([{"action": {"recall": {"rid": scene_id, "rtype": "scene"}}}])
 
@@ -1581,7 +1597,10 @@ def sync_switches_for_room(
                     ])
                     logger.info(f"  Button {button_cfg.button_number}: timezone ({button_cfg.target}) - {slot_summary}")
                 elif button_cfg.action == 'scene_cycle':
-                    logger.info(f"  Button {button_cfg.button_number}: scene_cycle ({button_cfg.target}) - {', '.join(button_cfg.scenes)}")
+                    # Determine effective values for logging
+                    effective_target = button_cfg.target if button_cfg.target is not None else room_config.room_name
+                    effective_scenes = button_cfg.scenes if button_cfg.scenes is not None else [s.name for s in room_config.scenes]
+                    logger.info(f"  Button {button_cfg.button_number}: scene_cycle ({effective_target}) - {', '.join(effective_scenes)}")
                 elif button_cfg.action == 'room_toggle':
                     logger.info(f"  Button {button_cfg.button_number}: room_toggle ({button_cfg.target})")
                 else:
@@ -1601,7 +1620,10 @@ def sync_switches_for_room(
                     ])
                     logger.info(f"  Button {button_cfg.button_number}: timezone ({button_cfg.target}) - {slot_summary}")
                 elif button_cfg.action == 'scene_cycle':
-                    logger.info(f"  Button {button_cfg.button_number}: scene_cycle ({button_cfg.target}) - {', '.join(button_cfg.scenes)}")
+                    # Determine effective values for logging
+                    effective_target = button_cfg.target if button_cfg.target is not None else room_config.room_name
+                    effective_scenes = button_cfg.scenes if button_cfg.scenes is not None else [s.name for s in room_config.scenes]
+                    logger.info(f"  Button {button_cfg.button_number}: scene_cycle ({effective_target}) - {', '.join(effective_scenes)}")
                 elif button_cfg.action == 'room_toggle':
                     logger.info(f"  Button {button_cfg.button_number}: room_toggle ({button_cfg.target})")
                 else:
@@ -1617,6 +1639,7 @@ def sync_switches_for_room(
                 device_name=switch_name,
                 model_id=model_id,
                 room_id=room_id,
+                room_name=room_config.room_name,
                 switch_config=switch_config,
                 room_lookup=room_lookup,
                 zone_lookup=zone_lookup,
